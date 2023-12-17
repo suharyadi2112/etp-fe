@@ -6,7 +6,7 @@
     <div class="d-flex align-items-center justify-content-between">
     <a href="index.html" class="logo d-flex align-items-center">
         <img src="../../../public/assets/img/logo.png" alt="">
-        <span class="d-none d-lg-block">DWL</span>
+        <span class="d-none d-lg-block">ETP</span>
     </a>
     <i @click="toggleSidebar" class="bi bi-list toggle-sidebar-btn"></i>
     </div>

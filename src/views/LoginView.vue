@@ -31,8 +31,8 @@
                             <label for="yourEmail" class="form-label">Email</label>
                             <div class="input-group has-validation">
                                 <span class="input-group-text" id="inputGroupPrepend"><i class="bi bi-envelope"></i></span>
-                                <input type="text" v-model="email" class="form-control" id="yourEmail" required>
-                                <div class="invalid-feedback">Please enter your username.</div>
+                                <input type="text" v-model="email" class="form-control" id="yourEmail" placeholder="check@gmail.com" :class="{ 'is-invalid': isInvalidEmail }" required>
+                                <div class="invalid-feedback" v-show="isInvalidEmail || emailErrorMessage">{{ emailErrorMessage || 'Please enter a valid email address.' }}</div>
                             </div>
                             </div>
 
@@ -40,8 +40,8 @@
                             <label for="yourPassword" class="form-label">Password</label>
                             <div class="input-group has-validation">
                                 <span class="input-group-text" id="inputGroupPrepend"><i class="bi bi-key-fill"></i></span>
-                                <input type="password" v-model="password" class="form-control" id="yourPassword" required>
-                                <div class="invalid-feedback">Please enter your password.</div>
+                                <input type="password" v-model="password" placeholder="Check123@" class="form-control" id="yourPassword" :class="{ 'is-invalid': isInvalidPass }" required>
+                                <div class="invalid-feedback" v-show="isInvalidPass || passwordErrorMessage">{{ passwordErrorMessage || 'Please enter your password.' }}</div>
                             </div>
                             </div>
 
@@ -90,8 +90,19 @@ export default {
             loading: false,
             email: '',
             password: '',
+            isInvalidEmail: false,
+            isInvalidPass: false,
+            emailErrorMessage: null,
+            passwordErrorMessage: null,
         };
     },
+    watch: {
+        email: function(newEmail) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          this.isInvalidEmail = !emailRegex.test(newEmail);
+          this.emailErrorMessage = null; 
+        },
+      },
     methods: {
         async login() {
             try {
@@ -109,10 +120,12 @@ export default {
                 
                 const response = await axios.post(Url, data);
                 const token = response.data.data.access_token;
+                const permission = response.data.data.permission;
 
                 if (token) {
 
                     localStorage.setItem('tokenETP', token);
+                    localStorage.setItem('permissions', JSON.stringify(permission));
 
                     this.Toasttt('success','Welcome Back')
                     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -129,6 +142,16 @@ export default {
                         this.Toasttt('error',error.response.data.error)
                     }else if (error.response.status == 401 && error.response.data.message == 'Unauthorised') {
                         this.Toasttt('warning','Unauthorized Access')
+                    }else if (error.response && error.response.status === 400 && error.response.data.message) {
+                        const emailErrorMessage = error.response.data.message.email;
+                        const passwordErrorMessage = error.response.data.message.password;
+                        if (Array.isArray(emailErrorMessage) && emailErrorMessage.length > 0) {
+                          this.emailErrorMessage = emailErrorMessage[0];
+                        }
+                        if (Array.isArray(passwordErrorMessage) && passwordErrorMessage.length > 0) {
+                          this.isInvalidPass = true
+                          this.passwordErrorMessage = passwordErrorMessage[0];
+                        }
                     }else{
                         // Handle login error
                         this.Toasttt('error',error)
