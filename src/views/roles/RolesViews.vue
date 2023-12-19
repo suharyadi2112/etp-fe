@@ -21,13 +21,12 @@
                     </div><!-- End Page Title -->
                   </div>
                   <div class="col-sm-2 text-end">
-                    <button class="btn btn-primary rounded-pill shadow" @click="showDialogRoles">
-                      <i class="bi bi-plus-circle"></i> Add Roles
-                    </button>
+                    <ModalAddRoles></ModalAddRoles>
                   </div>
                 </div>
+              <button @click="changeIt">Change It</button>
               <div class="table table-responsive">
-                <RolesDataTable :columns="columns" :options="options" :ajax="ajaxConfig" />
+                <RolesDataTable ref="table" :columns="columns" :options="options" :ajax="ajaxConfig" />
               </div>
             </div>
           </div>
@@ -51,26 +50,30 @@
   }
 </style>
 
+
 <script>
 import RolesDataTable from '@/components/roles_component/RolesTables.vue';
-// import axios from 'axios';
+import ModalAddRoles from "@/components/roles_component/RolesModalAdd.vue"; // Adjust the path accordingly
 
 export default {
   components: {
     RolesDataTable,
+    ModalAddRoles,
   },
   data() {
     return {
       columns: [
-        { data: 'id' },
+        { data: 'id' , visible: false},
         { data: 'name' },
         { data: 'guard_name' },
       ],
+      dt: null,
       options : {
         responsive: true,
         select: true,
         serverSide: true,
         processing: true,
+        order: [[ 0, "desc" ]]
       },
     }
   },
@@ -89,35 +92,5 @@ export default {
       };
     }
   },
-  methods: {
-    async showDialogRoles() {
-      const ipAPI = "//api.ipify.org?format=json";
-
-      try {
-        const response = await fetch(ipAPI);
-        const data = await response.json();
-        const inputValue = data.ip;
-
-        const { value: ipAddress } = await this.$swal.fire({
-          title: "Enter your IP address",
-          input: "text",
-          inputLabel: "Your IP address",
-          inputValue,
-          showCancelButton: true,
-          inputValidator: (value) => {
-            if (!value) {
-              return "You need to write something!";
-            }
-          }
-        });
-
-        if (ipAddress) {
-          this.$swal.fire(`Your IP address is ${ipAddress}`);
-        }
-      } catch (error) {
-        console.error("Error fetching IP address:", error);
-      }
-    }
-  }
 };
 </script>
