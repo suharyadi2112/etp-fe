@@ -61,7 +61,7 @@ export default {
             title: "Success!",
             text: "Data successfully stored",
             icon: "success",
-          }).then((result) => {
+          }).then(() => {
             this.$emit('rolesAdd');
           })
         }
