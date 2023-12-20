@@ -83,25 +83,6 @@ export default {
       },
     }
   },
-  methods : {
-    Toasttt(msg, type){
-      const Toast = this.$swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-              toast.onmouseenter = this.$swal.stopTimer;
-              toast.onmouseleave = this.$swal.resumeTimer;
-          }
-      });
-          Toast.fire({
-          icon: type,
-          title: msg
-      });
-    },
-  },
 
 };
 </script>
