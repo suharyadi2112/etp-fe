@@ -57,33 +57,16 @@ export default {
         allowOutsideClick: () => !this.$swal.isLoading()
       }).then((result) => {
         if (result.isConfirmed) {
-          this.Toasttt("success","Data successfully stored")
-          // console.log(this.$refs.table)
-          this.$emit('rolesAdd');
+          this.$swal.fire({
+            title: "Success!",
+            text: "Data successfully stored",
+            icon: "success",
+          }).then((result) => {
+            this.$emit('rolesAdd');
+          })
         }
       });
-    },
-    Toasttt(type,msg){
-        const Toast = this.$swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.onmouseenter = this.$swal.stopTimer;
-                toast.onmouseleave = this.$swal.resumeTimer;
-            }
-        });
-        Toast.fire({
-            icon: type,
-            title: msg || "Failed"
-        });
     },
   },
 }
 </script>
-
-<style scoped>
-/* Add your component-specific styles here if needed */
-</style>
