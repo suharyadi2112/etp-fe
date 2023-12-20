@@ -63,24 +63,6 @@ export default {
         }
       });
     },
-    async PostRoles(){
-      try {
-
-        const token = localStorage.getItem('tokenETP');
-        const baseUrl = process.env.BE_APP_BASE_URL;
-
-        const response = await axios.post(`${baseUrl}/api/store_roles`, null, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-        });
-        console.log(response)
-
-      } catch (error) {
-          console.error('Logout failed. Server response:', error.response);
-      }
-    },
     Toasttt(type,msg){
         const Toast = this.$swal.mixin({
             toast: true,

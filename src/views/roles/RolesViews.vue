@@ -20,23 +20,24 @@
                   </div><!-- End Page Title -->
                 </div>
                 <div class="col-sm-2 text-end">
-                  <ModalAddRoles  @rolesAdd="refreshData"></ModalAddRoles>
+                  <ModalAddRoles @rolesAdd="refreshData"></ModalAddRoles>
                 </div>
               </div>
               <div class="table table-responsive">
                  <DataTable
+                  ref = "table"
                   :columns="columns"
                   :options="options"
                   :ajax="ajax"
                   class="table table-hover"
                   width="100%"
-                  ref = "table"
                 >
                   <thead>
                     <tr>
                       <th>ID</th>
                       <th>Name</th>
                       <th>Guard Name</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                 </DataTable>
@@ -62,14 +63,81 @@
   }
 </style>
 
-<script>
-import ModalAddRoles from "@/components/roles_component/RolesModalAdd.vue"; // Adjust the path accordingly
+<script setup>
+  import { ref, onMounted } from 'vue'
+  import $ from 'jquery';
+  import Swal from 'sweetalert2'
+  import axios from 'axios';
 
-// import axios from 'axios';
+  let dt;
+  const table = ref();
+
+  onMounted(function () {
+    dt = table.value.dt;
+
+    $(dt.table().body()).on('click', 'button.DeleteBtn', function () {
+      const rowData = dt.row($(this).parents('tr')).data();
+      DeleteDataRoles(rowData.id);
+    });
+
+  });
+
+  const DeleteDataRoles = (dataID) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      showLoaderOnConfirm: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      preConfirm: async (login) => {
+         try {
+            const response = await axios.post(`${baseUrl}/api/del_roles/${dataID}`, null, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            });
+
+            return response
+
+          } catch (error) {
+            if (error.response && error.response.status == 400) {
+              Swal.showValidationMessage(`
+                Request failed: ${error.response.data.message}
+              `);
+            }
+            console.error(error,"check error");
+          }
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Success!",
+          text: "Success Delete Data",
+          icon: "success",
+        }).then((result) => {
+          dt.ajax.reload(null, false)
+        })
+      }
+    });
+  };
+
+</script>
+
+<script>
+
+import ModalAddRoles from "@/components/roles_component/RolesModalAdd.vue";
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net-bs5';
 
 DataTable.use(DataTablesCore);
+
+const token = localStorage.getItem('tokenETP');
+const baseUrl = process.env.BE_APP_BASE_URL;
+const ajaxUrl = `${baseUrl}/api/get_roles`;
 
 export default {
   components: {
@@ -77,22 +145,24 @@ export default {
     ModalAddRoles,
   },
   data() {
-
-    const token = localStorage.getItem('tokenETP');
-    const baseUrl = process.env.BE_APP_BASE_URL;
-    const ajaxUrl = `${baseUrl}/api/get_roles`;
-
     return {
       columns: [
         { data: 'id' , visible: false},
         { data: 'name' },
         { data: 'guard_name' },
+        { data: null, orderable: false, 
+            render: function (data) { 
+              return '<button class="btn btn-sm shadow btn-danger rounded-pill DeleteBtn" data-id='+data.id+'><i class="bi bi-trash3"></i> Delete</button>'; 
+          },
+        }
+
       ],
       options : {
         responsive: true,
         select: true,
         serverSide: true,
         processing: true,
+        stateSave: true,
         order: [[ 0, "desc" ]],
       },
       ajax: {
@@ -113,7 +183,6 @@ export default {
   },
   methods: {
     refreshData() {
-      console.log(this.$refs.table.dt)
       this.$refs.table.dt.ajax.reload()
     },
     Toasttt(msg, type){
@@ -134,6 +203,7 @@ export default {
       });
     },
   },
+
 }
 </script>
 
