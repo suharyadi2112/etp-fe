@@ -58,8 +58,8 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           this.Toasttt("success","Data successfully stored")
-          this.$forceUpdate();
-          // this.$router.go(0)
+          // console.log(this.$refs.table)
+          this.$emit('rolesAdd');
         }
       });
     },
@@ -95,7 +95,7 @@ export default {
         });
         Toast.fire({
             icon: type,
-            title: msg || "Failed Login"
+            title: msg || "Failed"
         });
     },
   },

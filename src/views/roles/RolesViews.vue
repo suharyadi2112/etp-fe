@@ -20,11 +20,26 @@
                   </div><!-- End Page Title -->
                 </div>
                 <div class="col-sm-2 text-end">
-                  <ModalAddRoles></ModalAddRoles>
+                  <ModalAddRoles  @rolesAdd="refreshData"></ModalAddRoles>
                 </div>
               </div>
               <div class="table table-responsive">
-                <RolesDataTable ref="tableRoles" :columns="columns" :options="options" />
+                 <DataTable
+                  :columns="columns"
+                  :options="options"
+                  :ajax="ajax"
+                  class="table table-hover"
+                  width="100%"
+                  ref = "table"
+                >
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Guard Name</th>
+                    </tr>
+                  </thead>
+                </DataTable>
               </div>
             </div>
           </div>
@@ -42,31 +57,31 @@
   div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     margin-top: 30px;
   }
-
   .breadJa{
     margin-top: 10px;
   }
 </style>
 
-
-
 <script>
-import RolesDataTable from '@/components/roles_component/RolesTables.vue';
 import ModalAddRoles from "@/components/roles_component/RolesModalAdd.vue"; // Adjust the path accordingly
 
+// import axios from 'axios';
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net-bs5';
-import 'datatables.net-select';
 
 DataTable.use(DataTablesCore);
 
 export default {
-
   components: {
-    RolesDataTable,
+    DataTable,
     ModalAddRoles,
   },
   data() {
+
+    const token = localStorage.getItem('tokenETP');
+    const baseUrl = process.env.BE_APP_BASE_URL;
+    const ajaxUrl = `${baseUrl}/api/get_roles`;
+
     return {
       columns: [
         { data: 'id' , visible: false},
@@ -79,11 +94,50 @@ export default {
         serverSide: true,
         processing: true,
         order: [[ 0, "desc" ]],
-        dataTable: null,
+      },
+      ajax: {
+        url: ajaxUrl,
+        type: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        dataSrc: 'data',
+        error: (xhr) => {
+          if (xhr.status === 401) {
+            this.Toasttt('Unauthorized. You do not have access.', 'warning');
+            this.$router.push('/login');
+          }
+        }
       },
     }
   },
-
-};
+  methods: {
+    refreshData() {
+      console.log(this.$refs.table.dt)
+      this.$refs.table.dt.ajax.reload()
+    },
+    Toasttt(msg, type){
+      const Toast = this.$swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+              toast.onmouseenter = this.$swal.stopTimer;
+              toast.onmouseleave = this.$swal.resumeTimer;
+          }
+      });
+          Toast.fire({
+          icon: type,
+          title: msg
+      });
+    },
+  },
+}
 </script>
 
+
+<style scoped>
+  @import 'datatables.net-bs5';
+</style>
