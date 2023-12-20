@@ -58,7 +58,8 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           this.Toasttt("success","Data successfully stored")
-          // this.$router.go();
+          this.$forceUpdate();
+          // this.$router.go(0)
         }
       });
     },

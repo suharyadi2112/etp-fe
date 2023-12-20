@@ -7,26 +7,24 @@
         <div class="col-lg-12">
           <div class="card shadow">
             <div class="card-body p-4">
-        
-                <div class="row">
-                  <div class="col-sm-10">
-                    <div class="pagetitle"> 
-                      <h1 class="text-left">Roles</h1>
-                      <nav>
-                        <ol class="breadcrumb breadJa">
-                          <router-link :to="{ name: '/'}" class="breadcrumb-item">Home</router-link>
-                          <router-link :to="{ name: 'rolesdashboard'}" class="breadcrumb-item">Roles</router-link>
-                        </ol>
-                      </nav>
-                    </div><!-- End Page Title -->
-                  </div>
-                  <div class="col-sm-2 text-end">
-                    <ModalAddRoles></ModalAddRoles>
-                  </div>
+              <div class="row">
+                <div class="col-sm-10">
+                  <div class="pagetitle"> 
+                    <h1 class="text-left">Roles</h1>
+                    <nav>
+                      <ol class="breadcrumb breadJa">
+                        <router-link :to="{ name: '/'}" class="breadcrumb-item">Home</router-link>
+                        <router-link :to="{ name: 'rolesdashboard'}" class="breadcrumb-item">Roles</router-link>
+                      </ol>
+                    </nav>
+                  </div><!-- End Page Title -->
                 </div>
-              <button @click="changeIt">Change It</button>
+                <div class="col-sm-2 text-end">
+                  <ModalAddRoles></ModalAddRoles>
+                </div>
+              </div>
               <div class="table table-responsive">
-                <RolesDataTable ref="table" :columns="columns" :options="options" :ajax="ajaxConfig" />
+                <RolesDataTable ref="tableRoles" :columns="columns" :options="options" />
               </div>
             </div>
           </div>
@@ -51,11 +49,19 @@
 </style>
 
 
+
 <script>
 import RolesDataTable from '@/components/roles_component/RolesTables.vue';
 import ModalAddRoles from "@/components/roles_component/RolesModalAdd.vue"; // Adjust the path accordingly
 
+import DataTable from 'datatables.net-vue3';
+import DataTablesCore from 'datatables.net-bs5';
+import 'datatables.net-select';
+
+DataTable.use(DataTablesCore);
+
 export default {
+
   components: {
     RolesDataTable,
     ModalAddRoles,
@@ -67,30 +73,36 @@ export default {
         { data: 'name' },
         { data: 'guard_name' },
       ],
-      dt: null,
       options : {
         responsive: true,
         select: true,
         serverSide: true,
         processing: true,
-        order: [[ 0, "desc" ]]
+        order: [[ 0, "desc" ]],
+        dataTable: null,
       },
     }
   },
-  computed: {
-    ajaxConfig() {
-      const token = localStorage.getItem('tokenETP');
-      const baseUrl = process.env.BE_APP_BASE_URL;
-      const Url = `${baseUrl}/api/get_roles`;
-      return {
-        url: Url,
-        type: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        dataSrc: 'data'
-      };
-    }
+  methods : {
+    Toasttt(msg, type){
+      const Toast = this.$swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+              toast.onmouseenter = this.$swal.stopTimer;
+              toast.onmouseleave = this.$swal.resumeTimer;
+          }
+      });
+          Toast.fire({
+          icon: type,
+          title: msg
+      });
+    },
   },
+
 };
 </script>
+

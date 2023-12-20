@@ -140,7 +140,7 @@ export default {
                 if (error.response && error.response.status) {
                     if (error.response.status == 500 && error.response.data.message == 'Server Error') {
                         this.Toasttt('error',error.response.data.error)
-                    }else if (error.response.status == 401 && error.response.data.message == 'Unauthorised') {
+                    }else if (error.response.status == 401 && error.response.data.message == 'Unauthorized') {
                         this.Toasttt('warning','Unauthorized Access')
                     }else if (error.response && error.response.status === 400 && error.response.data.message) {
                         const emailErrorMessage = error.response.data.message.email;

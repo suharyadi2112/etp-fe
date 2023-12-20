@@ -3,6 +3,7 @@
   <DataTable
     :columns="columns"
     :options="options"
+    :ajax="ajaxConfig"
     class="table table-hover"
     width="100%"
   >
@@ -20,6 +21,7 @@
 <script>
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net-bs5';
+import 'datatables.net-select';
 
 DataTable.use(DataTablesCore);
 
@@ -31,6 +33,33 @@ export default {
     columns: Array,
     data: Array,
     options: Object,
+    ajax : Object,
+  },
+  computed: {
+    ajaxConfig() {
+      const token = localStorage.getItem('tokenETP');
+      const baseUrl = process.env.BE_APP_BASE_URL;
+      const Url = `${baseUrl}/api/get_roles`;
+      return {
+        url: Url,
+        type: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        dataSrc: 'data',
+         error: (xhr) => {
+          if (xhr.status === 401) {
+            this.Toasttt('Unauthorized. You do not have access.', 'warning');
+            this.$router.push('/login');
+          }
+        }
+      };
+    }
+  },
+  methods: {
+    loadData() {
+      this.ajaxConfig()
+    },
   },
 };
 </script>

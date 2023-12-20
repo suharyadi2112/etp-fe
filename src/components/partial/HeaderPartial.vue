@@ -276,6 +276,8 @@ export default {
             }
         } catch (error) {
             this.Toasttt('An error occurred during logout', 'error');
+            localStorage.removeItem('tokenETP');
+            this.$router.push('/login');
         } finally {
             NProgress.done();
         }
