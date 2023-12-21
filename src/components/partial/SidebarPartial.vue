@@ -29,9 +29,9 @@
             </router-link>
         </li>
         <li>
-            <a href="components-alerts.html">
+            <router-link to="/permission" class="nav-link collapsed">
             <i class="bi bi-circle"></i><span>Permission</span>
-            </a>
+            </router-link>
         </li>
         
         </ul>

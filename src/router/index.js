@@ -5,6 +5,8 @@ import LoginView from '../views/LoginView.vue'
 
 //roles
 import RolesDashboard from '../views/roles/RolesViews.vue'
+import PermissionDashboard from '../views/permission/PermissionViews.vue'
+//permission
 import NProgress from 'nprogress';
 
 const routes = [
@@ -13,6 +15,8 @@ const routes = [
   { path: '/login', name: 'login', components: { default: LoginView }, meta: { layout: 'login' } },
   //roles
   { path: '/roles', name: 'rolesdashboard', components: { default: RolesDashboard }, meta: { requiresAuth: true } },
+  //permission
+  { path: '/permission', name: 'permisdashboard', components: { default: PermissionDashboard }, meta: { requiresAuth: true } },
 ]
 
 
