@@ -67,7 +67,7 @@ export default {
   color: #2c3e50;
 }
 */
-/*nav {
+nav {
   padding: 0px;
 }
 
@@ -78,6 +78,6 @@ nav a {
 
 nav a.router-link-exact-active {
   color: #42b983;
-}*/
+}
 
 </style>

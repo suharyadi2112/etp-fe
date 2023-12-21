@@ -37,7 +37,7 @@
                       <th>ID</th>
                       <th>Name</th>
                       <th>Guard Name</th>
-                      <th>Action</th>
+                      <th style="width:20%;">Action</th>
                     </tr>
                   </thead>
                 </DataTable>
@@ -80,7 +80,66 @@
       DeleteDataRoles(rowData.id);
     });
 
+    $(dt.table().body()).on('click', 'button.EditBtn', function () {
+      const rowDataUp = dt.row($(this).parents('tr')).data();
+      UpdateDataRoles(rowDataUp.id, rowDataUp.name);
+    });
+
   });
+
+  const UpdateDataRoles = (dataIDUp, dataName) => {
+    Swal.fire({
+        title: "Update Name Roles",
+        input: "text",
+        inputValue: dataName,
+        inputAttributes: {
+          autocapitalize: "off"
+        },
+        showCancelButton: true,
+        confirmButtonText: "Update",
+        showLoaderOnConfirm: true,
+        inputPlaceholder: "Manager",
+        preConfirm: async (newName) => {
+          try {
+            let data = {
+                nameroles: newName,
+                id_roles: dataIDUp
+            } 
+            const response = await axios.post(`${baseUrl}/api/update_roles`, data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            return response
+
+          } catch (error) {
+            if (error.response && error.response.data.message.nameroles) {
+              Swal.showValidationMessage(`
+                Request failed: ${error.response.data.message.nameroles}
+              `);
+            }else{
+               Swal.showValidationMessage(`
+                Request failed: ${error}
+              `);
+             }
+          }
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Success!",
+            text: "Data successfully updated",
+            icon: "success",
+          }).then(() => {
+            dt.ajax.reload(null, false)
+          })
+        }
+      });
+
+  } 
 
   const DeleteDataRoles = (dataID) => {
     Swal.fire({
@@ -152,10 +211,9 @@ export default {
         { data: 'guard_name' },
         { data: null, orderable: false, 
             render: function (data) { 
-              return '<button class="btn btn-sm shadow btn-danger rounded-pill DeleteBtn" data-id='+data.id+'><i class="bi bi-trash3"></i> Delete</button>'; 
+              return '<button class="btn btn-outline-primary btn-sm shadow rounded-pill EditBtn" data-id='+data.id+' data-name='+data.name+'><i class="bi bi-pencil"></i> Edit</button> | <button class="btn btn-sm shadow btn-danger rounded-pill DeleteBtn" data-id='+data.id+'><i class="bi bi-trash3"></i> Delete</button>'; 
           },
         }
-
       ],
       options : {
         responsive: true,
