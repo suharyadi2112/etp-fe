@@ -126,7 +126,7 @@
              }
           }
         },
-        allowOutsideClick: () => !this.$swal.isLoading()
+        allowOutsideClick: () => !Swal.isLoading()
       }).then((result) => {
         if (result.isConfirmed) {
           Swal.fire({
