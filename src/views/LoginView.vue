@@ -105,6 +105,9 @@ export default {
         },
       },
     methods: {
+        async getTokenCsrf(){
+            await axios.get(`${this.baseUrl}/sanctum/csrf-cookie`);
+        },
         async login() {
             try {
                 NProgress.start();
@@ -116,6 +119,7 @@ export default {
                     password: this.password,
                 }
                 
+                await this.getTokenCsrf();
                 const response = await axios.post(`${this.baseUrl}/api/login`, data);
                 const token = response.data.data.access_token;
                 const permission = response.data.data.permission;
