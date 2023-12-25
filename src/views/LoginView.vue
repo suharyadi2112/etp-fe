@@ -94,6 +94,7 @@ export default {
             isInvalidPass: false,
             emailErrorMessage: null,
             passwordErrorMessage: null,
+            baseUrl: process.env.BE_APP_BASE_URL,
         };
     },
     watch: {
@@ -110,15 +111,12 @@ export default {
                 this.loading = true
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                const baseUrl = process.env.BE_APP_BASE_URL;
-                const Url = `${baseUrl}/api/login`;
-
                 let data = {
                     email: this.email,
                     password: this.password,
                 }
                 
-                const response = await axios.post(Url, data);
+                const response = await axios.post(`${this.baseUrl}/api/login`, data);
                 const token = response.data.data.access_token;
                 const permission = response.data.data.permission;
 
