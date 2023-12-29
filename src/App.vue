@@ -49,7 +49,7 @@ export default {
     },
     mounted() {
       let bootstrap = document.createElement('script')
-      bootstrap.setAttribute('src', 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js')
+      bootstrap.setAttribute('src', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js')
       document.head.appendChild(bootstrap)
 
     },
