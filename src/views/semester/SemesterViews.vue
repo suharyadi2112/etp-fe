@@ -45,7 +45,7 @@
                 <table class="table table-hover table-bordered shadow-sm">
                   <thead>
                     <tr>
-                      <th scope="col">#</th>
+                      <th scope="col" style="text-align: center;">#</th>
                       <th scope="col">Semester</th>
                       <th scope="col">Tahun Akademik</th>
                       <th scope="col">Mulai</th>
@@ -64,15 +64,18 @@
                         </div>
                       </td>
                     </tr>
-                    <tr v-else v-for="item in items" :key="item.id">
-                      <th scope="row">{{ item.number }}</th>
+                    <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
+                      <th scope="row" style="text-align: center;">{{ item.number }}</th>
                       <td>{{ item.semester_name }}</td>
                       <td>{{ item.academic_year }}</td>
                       <td>{{ item.start_date }}</td>
                       <td>{{ item.end_date }}</td>
                       <td>{{ item.active_status }}</td>
                       <td>{{ item.description }}</td>
-                      <td>Roarrr</td>
+                      <td nowrap="">
+                          <button type="submit" class="btn btn-info btn-sm m-1 shadow"><i class="bi-pencil"></i></button>
+                          <button type="submit" class="btn btn-outline-danger btn-sm m-1 shadow"><i class="bi-trash"></i></button>
+                      </td>
                     </tr>
                     <tr v-if="!loading && items.length === 0">
                       <td colspan="10" class="text-center">No results found.</td>
@@ -224,6 +227,7 @@ export default {
       this.fetchData();
     },
     changeEntries(option) {
+      this.currentPage = 1;// ulangi currentpage, jika pilihan change entries
       this.selectedEntries = option;
       this.fetchData();
     },
