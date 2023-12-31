@@ -7,7 +7,7 @@
           <div class="card shadow">
             <div class="card-body p-4">
               <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-10">
                   <div class="pagetitle"> 
                     <h1 class="text-left">Semester</h1>
                     <nav>
@@ -17,6 +17,11 @@
                       </ol>
                     </nav>
                   </div>
+                </div>
+                <div class="col-2">
+                  <button type="button" class="btn btn-info btn-sm shadow" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="float: right;"><i class="bi bi-plus-circle"></i> add semester</button>
+                  <SemesterModalAdd/>
+
                 </div>
               </div>
               <!-- table -->
@@ -36,52 +41,56 @@
                   <div class="col-3">
                     <form class="row p-0" @submit.prevent="searchData">
                       <div class="input-group mb-3">
-                        <input type="text" v-model="searchQuery" class="form-control shadow-sm" placeholder="Search" aria-label="search" aria-describedby="button-addon2">
-                        <button class="btn btn-outline-primary shadow-sm" type="submit" id="button-addon2"><i class="bi bi-search"></i> Cari</button>
+                        <input type="text" v-model="searchQuery" class="form-control shadow-sm" placeholder="Genap" aria-label="search" aria-describedby="button-addon2">
+                        <button class="btn btn-outline-primary shadow-sm" type="submit" id="button-addon2"><i class="bi bi-search"></i> search</button>
                       </div>
                     </form>
                   </div>
                 </div>
-                <table class="table table-hover table-bordered shadow-sm">
-                  <thead>
-                    <tr>
-                      <th scope="col" style="text-align: center;">#</th>
-                      <th scope="col">Semester</th>
-                      <th scope="col">Tahun Akademik</th>
-                      <th scope="col">Mulai</th>
-                      <th scope="col">Selesai</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Deskripsi</th>
-                      <th scope="col">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="loading">
-                      <td colspan="10">
-                        <div class="d-flex justify-content-center text-primary m-3">
-                          <strong role="status" class="pt-1" style="padding-right: 2rem;">Loading...</strong>
-                          <div class="spinner-border shadow" aria-hidden="true"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
-                      <th scope="row" style="text-align: center;">{{ item.number }}</th>
-                      <td>{{ item.semester_name }}</td>
-                      <td>{{ item.academic_year }}</td>
-                      <td>{{ item.start_date }}</td>
-                      <td>{{ item.end_date }}</td>
-                      <td>{{ item.active_status }}</td>
-                      <td>{{ item.description }}</td>
-                      <td nowrap="">
-                          <button type="submit" class="btn btn-info btn-sm m-1 shadow"><i class="bi-pencil"></i></button>
-                          <button type="submit" class="btn btn-outline-danger btn-sm m-1 shadow"><i class="bi-trash"></i></button>
-                      </td>
-                    </tr>
-                    <tr v-if="!loading && items.length === 0">
-                      <td colspan="10" class="text-center">No results found.</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div class="table-responsive">
+                  <table class="table table-hover table-bordered shadow-sm caption-top">
+                    <caption class="pb-2 pt-0">List of semester</caption>
+                    <thead class="table-primary">
+                      <tr>
+                        <th scope="col" style="text-align: center;">#</th>
+                        <th scope="col">Semester</th>
+                        <th scope="col">Tahun Akademik</th>
+                        <th scope="col">Mulai</th>
+                        <th scope="col">Selesai</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Deskripsi</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-group-divider">
+                      <tr v-if="loading">
+                        <td colspan="10">
+                          <div class="d-flex justify-content-center text-primary m-3">
+                            <strong role="status" class="pt-1" style="padding-right: 2rem;">Loading...</strong>
+                            <div class="spinner-border shadow" aria-hidden="true"></div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
+                        <th scope="row" style="text-align: center;">{{ item.number }}</th>
+                        <td nowrap="">{{ item.semester_name }}</td>
+                        <td nowrap="">{{ item.academic_year }}</td>
+                        <td nowrap="">{{ item.start_date }}</td>
+                        <td nowrap="">{{ item.end_date }}</td>
+                        <td nowrap="">{{ item.active_status }}</td>
+                        <td>{{ item.description }}</td>
+                        <td nowrap="">
+                            <button type="submit" class="btn btn-info btn-sm m-1 shadow"><i class="bi-pencil"></i></button>
+                            <button type="submit" class="btn btn-outline-danger btn-sm m-1 shadow"><i class="bi-trash"></i></button>
+                        </td>
+                      </tr>
+                      <tr v-if="!loading && items.length === 0">
+                        <td colspan="10" class="text-center">No results found.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <!-- table -->
                 <div class="row">
                   <div class="col-9">
                     <!-- Showing Entries Message -->
@@ -89,7 +98,6 @@
                       Showing {{ startEntry }} to {{ endEntry }} of {{ totalItems }} entries
                     </p>
                   </div>
-                  <!-- table -->
                 <div class="col-3">
                   <!-- Pagination -->
                     <nav aria-label="Page navigation example">
@@ -123,9 +131,13 @@
 </style>
 
 <script>
+import SemesterModalAdd from '@/components/semester_component/SemesterModalAdd.vue';
 import axios from 'axios';
 
 export default {
+  components:{
+    SemesterModalAdd,
+  },
   data() {
     return {
       items: [],
@@ -230,6 +242,11 @@ export default {
       this.currentPage = 1;// ulangi currentpage, jika pilihan change entries
       this.selectedEntries = option;
       this.fetchData();
+    },
+
+    //modal add semester
+    handleSubmit() {
+      console.log("cek")
     },
     Toasttt(msg, type, detail){
       const Toast = this.$swal.mixin({
