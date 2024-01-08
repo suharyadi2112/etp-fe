@@ -8,42 +8,51 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
-        <form>
+        <form @submit.prevent="submitForm">
           <div class="modal-body row g-3">
             <div class="col-md-3">
-              <label for="semesterName" class="form-label">Semester</label>
-              <select id="semesterName" class="form-select">
-                <option selected>Choose...</option>
-                <option value="Genap">Genap</option>
-                <option value="Ganjil">Ganjil</option>
-              </select>
+
+              <div class="form-floating">
+                <select class="form-select" v-model="formData.selectedSemester" id="semesterName" aria-label="Floating label select example">
+                  <option value="" disabled selected>Choose...</option>
+                  <option value="Genap">Genap</option>
+                  <option value="Ganjil">Ganjil</option>
+                </select>
+                <label for="semesterName">Semester | {{ formData.selectedSemester }}</label>
+              </div>
             </div>
+            
             <div class="col-md-3">
-              <label for="academicYear" class="form-label">Tahun Akademik</label>
               <AcademicYearForm/>
             </div>
             <div class="col-md-3">
-              <label for="startDate" class="form-label">Mulai</label>
-              <input type="date" class="form-control" id="startDate">
+              <div class="form-floating mb-3">
+                <input type="date" class="form-control" id="startDate" v-model="formData.startDate">
+                <label for="startDate">Mulai</label>
+              </div>              
             </div>
             <div class="col-md-3">
-              <label for="endDate" class="form-label">Selesai</label>
-              <input type="date" class="form-control" id="endDate">
+              <div class="form-floating mb-3">
+                <input type="date" class="form-control" id="endDate" v-model="formData.endDate">
+                <label for="endDate">Selesai</label>
+              </div> 
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
               <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" v-model="formData.activeStatus">
                 <label class="form-check-label" for="flexSwitchCheckDefault">Active Status</label>
               </div>
             </div>
-            <div class="col-md-6">
-              <label for="description" class="form-label">Description</label>
-              <textarea class="form-control" placeholder="Description....."></textarea>
+            <div class="col-md-9">
+              <div class="form-floating">
+                <textarea class="form-control" placeholder="Description....."  v-model="formData.description" id="description" style="height: 100px"></textarea>
+                <label for="description">Deskripsi</label>
+              </div>
             </div>
           </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Understood</button>
+          <button type="button" class="btn btn-primary">Submit</button>
         </div>
       </form>
       </div>
@@ -53,10 +62,31 @@
 
 <script>
 import AcademicYearForm from '@/components/semester_component/AcademicYearForm.vue';
+// import axios from 'axios';
 
 export default {
   components: {
     AcademicYearForm
-  }
+  },
+  data() {
+    return {
+      formData: {
+        selectedSemester:'',
+        startDate: '',
+        endDate: '',
+        name: '',
+        email: '',
+        activeStatus: '',
+      },
+    }
+  },
+  methods: {
+    submitForm() {
+      this.sendStoreSemester();
+    },
+    sendStoreSemester() {
+      console.log("tes ---")
+    },
+  },
 };
 </script>

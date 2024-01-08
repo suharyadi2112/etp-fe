@@ -17,11 +17,10 @@
                       </ol>
                     </nav>
                   </div>
-                </div>
+                </div> 
                 <div class="col-2">
                   <button type="button" class="btn btn-info btn-sm shadow" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="float: right;"><i class="bi bi-plus-circle"></i> add semester</button>
                   <SemesterModalAdd/>
-
                 </div>
               </div>
               <!-- table -->
