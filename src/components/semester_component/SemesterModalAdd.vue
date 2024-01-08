@@ -13,17 +13,17 @@
             <div class="col-md-3">
 
               <div class="form-floating">
-                <select class="form-select" v-model="formData.selectedSemester" id="semesterName" aria-label="Floating label select example">
+                <select class="form-select" v-model="formData.semestername" id="semesterName" aria-label="Floating label select example">
                   <option value="" disabled selected>Choose...</option>
                   <option value="Genap">Genap</option>
                   <option value="Ganjil">Ganjil</option>
                 </select>
-                <label for="semesterName">Semester | {{ formData.selectedSemester }}</label>
+                <label for="semesterName">Semester | {{ formData.semestername }}</label>
               </div>
             </div>
             
             <div class="col-md-3">
-              <AcademicYearForm/>
+              <AcademicYearForm @selected="handleAcademicYear"></AcademicYearForm>
             </div>
             <div class="col-md-3">
               <div class="form-floating mb-3">
@@ -52,7 +52,7 @@
           </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
         </div>
       </form>
       </div>
@@ -62,7 +62,7 @@
 
 <script>
 import AcademicYearForm from '@/components/semester_component/AcademicYearForm.vue';
-// import axios from 'axios';
+import axios from 'axios';
 
 export default {
   components: {
@@ -70,22 +70,41 @@ export default {
   },
   data() {
     return {
+      baseUrl: process.env.BE_APP_BASE_URL,
+      token: localStorage.getItem('tokenETP'),
       formData: {
-        selectedSemester:'',
+        academicYear:'', //academic year
+        semestername:'',
         startDate: '',
         endDate: '',
-        name: '',
-        email: '',
         activeStatus: '',
+        description: '',
       },
     }
   },
   methods: {
+    handleAcademicYear(selectedValue) {
+      this.academicYear = selectedValue;
+    },
     submitForm() {
       this.sendStoreSemester();
     },
-    sendStoreSemester() {
-      console.log("tes ---")
+    async sendStoreSemester() {
+      try {
+          const response = await axios.post(`${this.baseUrl}/api/store_semester`, this.formData, {
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${this.token}`,
+              },
+          });
+          console.log(response)
+          return response
+
+      } catch (error) {
+        console.log(error.response)
+        console.log(error)
+      }
+
     },
   },
 };

@@ -1,7 +1,7 @@
 <template>
 <div class="form-floating">
     <select class="form-select"  v-model="selectedYear" @change="handleYearChange" id="TahunAcademic" aria-label="Floating label select example">
-      <option value="" disabled selected>Choose</option>
+        <option value="" disabled selected>Choose</option>
         <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
     </select>
         <div v-if="selectedYear" class="alert alert-info pb-1 pt-1 mt-2" role="alert">
@@ -25,6 +25,7 @@ export default {
       //Contoh: Memastikan hanya tahun yang diambil
       if (this.selectedYear) {
         this.selectedYear = this.selectedYear.substring(0, 4);
+        this.$emit('selected', this.selectedYear);
       }
     },
     getNextYear(year) {
