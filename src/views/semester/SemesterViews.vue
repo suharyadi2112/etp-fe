@@ -20,7 +20,7 @@
                 </div> 
                 <div class="col-2">
                   <button type="button" class="btn btn-info btn-sm shadow" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="float: right;"><i class="bi bi-plus-circle"></i> add semester</button>
-                  <SemesterModalAdd/>
+                  <SemesterModalAdd @semesterAdd="refreshData"> </SemesterModalAdd>
                 </div>
               </div>
               <!-- table -->
@@ -77,10 +77,9 @@
                         <td nowrap="">{{ item.start_date }}</td>
                         <td nowrap="">{{ item.end_date }}</td>
                         <td nowrap="">{{ item.active_status }}</td>
-                        <td>{{ item.description }}</td>
-                        <td nowrap="">
-                            <button type="submit" class="btn btn-info btn-sm m-1 shadow"><i class="bi-pencil"></i></button>
-                            <button type="submit" class="btn btn-outline-danger btn-sm m-1 shadow"><i class="bi-trash"></i></button>
+                        <td>{{ item.description ? item.description : '-' }}</td>
+                        <td nowrap="" style="text-align: center;">
+                            <button type="submit" class="btn btn-primary btn-sm m-1 shadow"><i class="bi-pencil"></i></button>
                         </td>
                       </tr>
                       <tr v-if="!loading && items.length === 0">
@@ -242,10 +241,8 @@ export default {
       this.selectedEntries = option;
       this.fetchData();
     },
-
-    //modal add semester
-    handleSubmit() {
-      console.log("cek")
+    refreshData(){
+      this.fetchData();
     },
     Toasttt(msg, type, detail){
       const Toast = this.$swal.mixin({

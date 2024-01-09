@@ -31,7 +31,7 @@
                   <table class="table table-bordered">
                     <thead>
                       <tr>
-                        <th style="width: 20%; vertical-align: middle; text-align: center;">Roles</th>
+                        <th style="width: 20%; vertical-align: middle; text-align: center;">Group</th>
                         <th style="vertical-align: middle; text-align: center;">Permission</th>
                       </tr>
                     </thead>

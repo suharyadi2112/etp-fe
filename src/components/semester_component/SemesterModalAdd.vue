@@ -10,6 +10,12 @@
 
         <form @submit.prevent="submitForm">
           <div class="modal-body row g-3">
+            <div class="col-12">
+              <div v-if="errorMessages.length > 0" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <li v-for="(errorMessage, index) in errorMessages" :key="index"><i class="bi bi-exclamation-circle"></i> {{ errorMessage }}</li>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            </div>
             <div class="col-md-3">
               <div class="input-group has-validation">
                 <div class="form-floating is-invalid">
@@ -67,7 +73,14 @@
           </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button class="btn btn-primary" style="float: right;" type="submit" :disabled="loadingSubmitSemester">
+            <span v-if="!loadingSubmitSemester"><i class="bi bi-arrow-repeat"></i> Submit Semester</span>
+            <span v-else>
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              <label> Submit Semester</label>
+            </span>
+          </button>
+
         </div>
       </form>
       </div>
@@ -95,7 +108,9 @@ export default {
         active_status: '',
         description: '',
       },
-      error : {},
+      error : {},//error clientside
+      loadingSubmitSemester : false, //progres btn
+      errorMessages: [],//error serverside
     }
   },
   methods: {
@@ -103,12 +118,14 @@ export default {
       this.formData.academic_year = selectedValue;
     },
     submitForm() {
+      this.loadingSubmitSemester = true //progres btn
       this.error = {};
       //validation
       const requiredFields = ['semester_name', 'academic_year', 'start_date', 'end_date'];
       requiredFields.forEach(field => {
         if (!this.formData[field]) {
           this.error[field] = true;
+          setTimeout(()=>{ this.loadingSubmitSemester = false },1000);
         }else{
           this.error[field] = false;// fill
         }
@@ -126,14 +143,42 @@ export default {
                   'Authorization': `Bearer ${this.token}`,
               },
           });
-          console.log(response)
+
+          this.Toasttt('Successfully', 'success', 'Data Semester Successfully Stored')
+          this.$emit('semesterAdd'); //sent signal to views
           return response
 
       } catch (error) {
-        console.log(error.response)
-        console.log(error)
+        if(error.response.data.message && error.response.status == 400){
+          this.errorMessages = [];
+          for (let field in error.response.data.message) { //list error 400
+            this.errorMessages.push(...error.response.data.message[field]);
+          }
+        }
+        console.log(error.response.data.message)
+      } finally { 
+        this.loadingSubmitSemester = false
       }
 
+    },
+    Toasttt(msg, type, detail){
+      const Toast = this.$swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          background: "#F8F8F8",
+          didOpen: (toast) => {
+              toast.onmouseenter = this.$swal.stopTimer;
+              toast.onmouseleave = this.$swal.resumeTimer;
+          }
+      });
+          Toast.fire({
+          icon: type,
+          title: msg,
+          text: detail,
+      });
     },
   },
 };
