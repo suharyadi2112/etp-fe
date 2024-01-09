@@ -79,7 +79,7 @@
                         <td nowrap="">{{ item.active_status }}</td>
                         <td>{{ item.description ? item.description : '-' }}</td>
                         <td nowrap="" style="text-align: center;">
-                            <button type="submit" class="btn btn-primary btn-sm m-1 shadow"><i class="bi-pencil"></i></button>
+                            <button type="submit" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateSemester"><i class="bi-pencil"></i></button>
                         </td>
                       </tr>
                       <tr v-if="!loading && items.length === 0">
@@ -88,6 +88,7 @@
                     </tbody>
                   </table>
                 </div>
+                <SemesterModalUpdate> </SemesterModalUpdate>
                 <!-- table -->
                 <div class="row">
                   <div class="col-9">
@@ -130,11 +131,13 @@
 
 <script>
 import SemesterModalAdd from '@/components/semester_component/SemesterModalAdd.vue';
+import SemesterModalUpdate from '@/components/semester_component/SemesterModalUpdate.vue';
 import axios from 'axios';
 
 export default {
   components:{
     SemesterModalAdd,
+    SemesterModalUpdate,
   },
   data() {
     return {
