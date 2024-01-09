@@ -11,44 +11,59 @@
         <form @submit.prevent="submitForm">
           <div class="modal-body row g-3">
             <div class="col-md-3">
-
-              <div class="form-floating">
-                <select class="form-select" v-model="formData.semestername" id="semesterName" aria-label="Floating label select example">
-                  <option value="" disabled selected>Choose...</option>
-                  <option value="Genap">Genap</option>
-                  <option value="Ganjil">Ganjil</option>
-                </select>
-                <label for="semesterName">Semester | {{ formData.semestername }}</label>
+              <div class="input-group has-validation">
+                <div class="form-floating is-invalid">
+                  <select :class="{ 'form-select': true, 'is-invalid': error.semester_name }" v-model="formData.semester_name" id="semesterName" aria-label="Floating label select example">
+                      <option value="" selected>Choose...</option>
+                      <option value="Genap">Genap</option>
+                      <option value="Ganjil">Ganjil</option>
+                    </select>
+                    <label for="semesterName">Semester | {{ formData.semester_name }}</label>
+                </div>
+                <div v-if="error.semester_name" class="invalid-feedback">
+                  Please select an option.
+                </div>
               </div>
             </div>
             
             <div class="col-md-3">
-              <AcademicYearForm @selected="handleAcademicYear"></AcademicYearForm>
+              <AcademicYearForm @selected="handleAcademicYear" :formData="formData" :validationErrors="error"></AcademicYearForm>
             </div>
             <div class="col-md-3">
-              <div class="form-floating mb-3">
-                <input type="date" class="form-control" id="startDate" v-model="formData.startDate">
-                <label for="startDate">Mulai</label>
-              </div>              
+              <div class="input-group has-validation">
+                <div class="form-floating is-invalid">
+                  <input type="date" id="startDate" :class="{ 'form-control': true,'is-invalid': error.start_date }" v-model="formData.start_date">
+                  <label for="startDate">Mulai</label>
+                </div> 
+                <div v-if="error.start_date" class="invalid-feedback">
+                  Please choose mulai.
+                </div>
+              </div>             
             </div>
             <div class="col-md-3">
-              <div class="form-floating mb-3">
-                <input type="date" class="form-control" id="endDate" v-model="formData.endDate">
-                <label for="endDate">Selesai</label>
-              </div> 
+              <div class="input-group has-validation">
+                <div class="form-floating is-invalid">
+                  <input type="date" :class="{ 'form-control': true,'is-invalid': error.end_date }" id="endDate" v-model="formData.end_date">
+                  <label for="endDate">Selesai</label>
+                </div> 
+                <div v-if="error.end_date" class="invalid-feedback">
+                  Please choose selesai.
+                </div>
+              </div>  
             </div>
             <div class="col-md-3">
               <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" v-model="formData.activeStatus">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" v-model="formData.active_status">
                 <label class="form-check-label" for="flexSwitchCheckDefault">Active Status</label>
               </div>
             </div>
             <div class="col-md-9">
-              <div class="form-floating">
-                <textarea class="form-control" placeholder="Description....."  v-model="formData.description" id="description" style="height: 100px"></textarea>
+              <div class="form-floating is-invalid">
+                <textarea :class="{ 'form-control': true }" placeholder="Description....."  v-model="formData.description" id="description" style="height: 100px"></textarea>
                 <label for="description">Deskripsi</label>
               </div>
             </div>
+
           </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -73,21 +88,35 @@ export default {
       baseUrl: process.env.BE_APP_BASE_URL,
       token: localStorage.getItem('tokenETP'),
       formData: {
-        academicYear:'', //academic year
-        semestername:'',
-        startDate: '',
-        endDate: '',
-        activeStatus: '',
+        academic_year:'', //academic year
+        semester_name:'',
+        start_date: '',
+        end_date: '',
+        active_status: '',
         description: '',
       },
+      error : {},
     }
   },
   methods: {
     handleAcademicYear(selectedValue) {
-      this.academicYear = selectedValue;
+      this.formData.academic_year = selectedValue;
     },
     submitForm() {
-      this.sendStoreSemester();
+      this.error = {};
+      //validation
+      const requiredFields = ['semester_name', 'academic_year', 'start_date', 'end_date'];
+      requiredFields.forEach(field => {
+        if (!this.formData[field]) {
+          this.error[field] = true;
+        }else{
+          this.error[field] = false;// fill
+        }
+      });
+      const hasErrors = requiredFields.some(field => this.error[field]);
+      if (!hasErrors) {
+        this.sendStoreSemester();
+      }
     },
     async sendStoreSemester() {
       try {
