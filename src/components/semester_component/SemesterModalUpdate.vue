@@ -9,9 +9,15 @@
           </div>
   
           <form @submit.prevent="submitForm">
-            <div class="modal-body row g-3">
-              <div class="col-12">
-                <div v-if="errorMessages.length > 0" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div v-if="!hasLoaded">
+              <div class="d-flex justify-content-center text-primary m-3">
+                <strong role="status" class="pt-1" style="padding-right: 2rem;">Retrieving Data...</strong>
+                <div class="spinner-border shadow" aria-hidden="true"></div>
+              </div>
+            </div>
+            <div  v-else class="modal-body row g-3">
+              <div v-if="errorMessages.length > 0"  class="col-12">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
                   <li v-for="(errorMessage, index) in errorMessages" :key="index"><i class="bi bi-exclamation-circle"></i> {{ errorMessage }}</li>
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -19,7 +25,7 @@
               <div class="col-md-3">
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
-                    <select :class="{ 'form-select': true, 'is-invalid': error.semester_name }" v-model="formData.semester_name" id="semesterName" aria-label="Floating label select example">
+                    <select :class="{ 'form-select': true, 'is-invalid': error.semester_name }" v-model="formData.data.semester_name" id="semesterName" aria-label="Floating label select example">
                         <option value="" selected>Choose...</option>
                         <option value="Genap">Genap</option>
                         <option value="Ganjil">Ganjil</option>
@@ -33,13 +39,13 @@
               </div>
               
               <div class="col-md-3">
-                <AcademicYearForm @selected="handleAcademicYear" :formData="formData" :validationErrors="error"></AcademicYearForm>
+                <AcademicYearForm @selected="handleAcademicYear" :chooseUpdate="formData.data.academic_year" :formData="formData" :validationErrors="error"></AcademicYearForm>
               </div>
               <div class="col-md-3">
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
-                    <input type="date" id="startDate" :class="{ 'form-control': true,'is-invalid': error.start_date }" v-model="formData.start_date">
-                    <label for="startDate">Mulai</label>
+                    <input type="date" id="startDate" :class="{ 'form-control': true,'is-invalid': error.start_date }" v-model="formData.data.start_date">
+                    <label for="startDate">Mulai {{ formData.start_date }}</label>
                   </div> 
                   <div v-if="error.start_date" class="invalid-feedback">
                     Please choose mulai.
@@ -49,7 +55,7 @@
               <div class="col-md-3">
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
-                    <input type="date" :class="{ 'form-control': true,'is-invalid': error.end_date }" id="endDate" v-model="formData.end_date">
+                    <input type="date" :class="{ 'form-control': true,'is-invalid': error.end_date }" id="endDate" v-model="formData.data.end_date">
                     <label for="endDate">Selesai</label>
                   </div> 
                   <div v-if="error.end_date" class="invalid-feedback">
@@ -59,25 +65,26 @@
               </div>
               <div class="col-md-3">
                 <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" v-model="formData.active_status">
+                  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" v-model="formData.data.active_status">
                   <label class="form-check-label" for="flexSwitchCheckDefault">Active Status</label>
                 </div>
               </div>
               <div class="col-md-9">
                 <div class="form-floating is-invalid">
-                  <textarea :class="{ 'form-control': true }" placeholder="Description....."  v-model="formData.description" id="description" style="height: 100px"></textarea>
+                  <textarea :class="{ 'form-control': true }" placeholder="Description....."  v-model="formData.data.description" id="description" style="height: 100px"></textarea>
                   <label for="description">Deskripsi</label>
                 </div>
               </div>
-  
-            </div>
+              
+            </div><!-- v-else--> 
+
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button class="btn btn-primary" style="float: right;" type="submit" :disabled="loadingSubmitSemester">
-              <span v-if="!loadingSubmitSemester"><i class="bi bi-arrow-repeat"></i> Submit Semester</span>
+            <button class="btn btn-outline-info" style="float: right;" type="submit" :disabled="loadingUpdateSemester">
+              <span v-if="!loadingUpdateSemester"><i class="bi bi-arrow-repeat"></i> Update Semester</span>
               <span v-else>
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                <label> Submit Semester</label>
+                <label> Update Semester</label>
               </span>
             </button>
   
@@ -96,21 +103,36 @@
     components: {
       AcademicYearForm
     },
+    props: { //recieve data dari parents
+      dataLoaded: Boolean,
+      dataFormUpdate: Object, 
+    },
+    computed: {
+      hasLoaded() {
+        return this.dataLoaded;
+      },
+    },
     data() {
       return {
         baseUrl: process.env.BE_APP_BASE_URL,
         token: localStorage.getItem('tokenETP'),
-        formData: {
-          academic_year:'', //academic year
-          semester_name:'',
-          start_date: '',
-          end_date: '',
-          active_status: '',
-          description: '',
-        },
+        formData: { ...this.dataFormUpdate },
         error : {},//error clientside
-        loadingSubmitSemester : false, //progres btn
+        loadingUpdateSemester : false, //progres btn
         errorMessages: [],//error serverside
+
+      }
+    },
+    watch: {
+      dataFormUpdate(newData) {
+        this.formData = { ...newData,
+          data: {
+            ...newData.data,
+            //check jika dari db Active, maka ganti ke true, begitu juga sebaliknya
+            active_status: newData.data.active_status === 'Active' ? true : false
+          }
+        };
+        console.log(this.formData.data, "tes----")
       }
     },
     methods: {
@@ -118,62 +140,46 @@
         this.formData.academic_year = selectedValue;
       },
       submitForm() {
-        this.loadingSubmitSemester = true //progres btn
+        this.loadingUpdateSemester = true //progres btn
         this.error = {};
         //validation
         const requiredFields = ['semester_name', 'academic_year', 'start_date', 'end_date'];
         requiredFields.forEach(field => {
           if (!this.formData[field]) {
             this.error[field] = true;
-            setTimeout(()=>{ this.loadingSubmitSemester = false },1000);
+            setTimeout(()=>{ this.loadingUpdateSemester = false },1000);
           }else{
             this.error[field] = false;// fill
           }
         });
         const hasErrors = requiredFields.some(field => this.error[field]);
         if (!hasErrors) {
-          this.sendStoreSemester();
+          this.sendUpdateSemester();
         }
-      },
-      async getUpdateSemester() {
-
-        try {
-            const response = await axios.get(`${this.baseUrl}/api/get_semester/b9b7ee7b-32e8-437f-b10d-8b609569a0c0`,{
-                headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                },
-            });
-  
-            return response
-  
-        } catch (error) {
-          console.log(error.response)
-        } finally { 
-          this.loadingSubmitSemester = false
-        }
-
       },
       async sendUpdateSemester() {
         try {
-            const response = await axios.post(`${this.baseUrl}/api/store_semester`, this.formData, {
+            const response = await axios.put(`${this.baseUrl}/api/update_semester/${this.formData.data.id}`, this.formData.data, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.token}`,
                 },
             });
   
-            this.Toasttt('Successfully', 'success', 'Data Semester Successfully Stored')
-            this.$emit('semesterAdd'); //sent signal to views
+            this.Toasttt('Successfully', 'success', 'Data Semester Successfully Updated')
+            this.$emit('semesterUpdate'); //sent signal to views
+            this.loadingUpdateSemester = false
             return response
   
         } catch (error) {
-          if(error.response.data.message && error.response.status == 400){
+          
+          if(error.response.message && error.response.status == 400){
             this.errorMessages = [];
             for (let field in error.response.data.message) { //list error 400
               this.errorMessages.push(...error.response.data.message[field]);
             }
           }
-          console.log(error.response.data.message)
+          console.log(error)
         } finally { 
           this.loadingSubmitSemester = false
         }
