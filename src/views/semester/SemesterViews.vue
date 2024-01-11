@@ -20,7 +20,7 @@
                 </div> 
                 <div class="col-2">
                   <button type="button" class="btn btn-info btn-sm shadow" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="float: right;"><i class="bi bi-plus-circle"></i> add semester</button>
-                  <SemesterModalAdd/>
+                  <SemesterModalAdd @semesterAdd="refreshData"> </SemesterModalAdd>
                 </div>
               </div>
               <!-- table -->
@@ -77,10 +77,11 @@
                         <td nowrap="">{{ item.start_date }}</td>
                         <td nowrap="">{{ item.end_date }}</td>
                         <td nowrap="">{{ item.active_status }}</td>
-                        <td>{{ item.description }}</td>
-                        <td nowrap="">
-                            <button type="submit" class="btn btn-info btn-sm m-1 shadow"><i class="bi-pencil"></i></button>
-                            <button type="submit" class="btn btn-outline-danger btn-sm m-1 shadow"><i class="bi-trash"></i></button>
+                        <td>{{ item.description ? item.description : '-' }}</td>
+                        <td nowrap="" style="text-align: center;">
+                            <button @click="openUpdateSemester(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateSemester" :disabled="OpenUpdateSemesterBtn" >
+                              <i class="bi bi-pencil"></i>
+                            </button>
                         </td>
                       </tr>
                       <tr v-if="!loading && items.length === 0">
@@ -89,6 +90,7 @@
                     </tbody>
                   </table>
                 </div>
+                <SemesterModalUpdate @semesterUpdate="refreshData" :dataLoaded="FetchUpdateData" :dataFormUpdate="FormDataUpdate"> </SemesterModalUpdate>
                 <!-- table -->
                 <div class="row">
                   <div class="col-9">
@@ -131,11 +133,13 @@
 
 <script>
 import SemesterModalAdd from '@/components/semester_component/SemesterModalAdd.vue';
+import SemesterModalUpdate from '@/components/semester_component/SemesterModalUpdate.vue';
 import axios from 'axios';
 
 export default {
   components:{
     SemesterModalAdd,
+    SemesterModalUpdate,
   },
   data() {
     return {
@@ -152,6 +156,11 @@ export default {
       startEntryData : 0,
       endEntryData: 0,
       totalItemsData : 0, 
+
+      OpenUpdateSemesterBtn : false,
+      FetchUpdateData : false,
+
+      FormDataUpdate : {} //data for update
     }
   },
   mounted() {
@@ -242,10 +251,29 @@ export default {
       this.selectedEntries = option;
       this.fetchData();
     },
-
-    //modal add semester
-    handleSubmit() {
-      console.log("cek")
+    refreshData(){
+      this.fetchData();
+    },
+    // ------------------update section---------------------
+    async openUpdateSemester(id){
+      this.OpenUpdateSemesterBtn = true
+      this.FetchUpdateData = false
+      try {
+          const response = await axios.get(`${this.baseUrl}/api/get_semester/${id}`,{
+              headers: {
+                  'Authorization': `Bearer ${this.token}`,
+              },
+          });
+          
+          this.FetchUpdateData = true //send info to child component update
+          this.FormDataUpdate = response.data //send data to child component
+          return response
+          
+      } catch (error) {
+        this.Toasttt("Server Error", "error", "")
+      } finally { 
+        this.OpenUpdateSemesterBtn = false
+      }
     },
     Toasttt(msg, type, detail){
       const Toast = this.$swal.mixin({

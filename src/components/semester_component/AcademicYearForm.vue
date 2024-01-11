@@ -21,7 +21,8 @@
 export default {
   props: { //recieve data dari parents
     formData: Object,
-    validationErrors: Object
+    validationErrors: Object,
+    chooseUpdate: String,
   },
   computed: {
     hasValidationError() {
@@ -30,7 +31,7 @@ export default {
   },
   data() {
     return {
-      selectedYear: '',
+      selectedYear: this.chooseUpdate ?? '', //digunakan untuk update dan create semester
       availableYears: generateYears(2024, 2030), // rentang tahun 2024 hingga 2030
     };
   },
