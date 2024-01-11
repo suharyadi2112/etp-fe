@@ -1,4 +1,4 @@
-FROM node:20.10.0-alpine
+FROM node:20.10.0-alpine AS feimage
 
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
@@ -9,7 +9,7 @@ COPY . /app
 RUN npm run build
 
 FROM nginx:1.23-alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=feimage /app/dist /usr/share/nginx/html
 EXPOSE 8085
 
 CMD ["nginx", "-g", "daemon off;"]
