@@ -19,14 +19,13 @@
               <div v-if="errorMessages.length > 0"  class="col-12">
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                   <li v-for="(errorMessage, index) in errorMessages" :key="index"><i class="bi bi-exclamation-circle"></i> {{ errorMessage }}</li>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
                     <select :class="{ 'form-select': true, 'is-invalid': error.semester_name }" v-model="formData.data.semester_name" id="semesterName" aria-label="Floating label select example">
-                        <option value="" selected>Choose...</option>
+                        <option value="" disabled selected>Choose...</option>
                         <option value="Genap">Genap</option>
                         <option value="Ganjil">Ganjil</option>
                       </select>
@@ -132,20 +131,20 @@
             active_status: newData.data.active_status === 'Active' ? true : false
           }
         };
-        console.log(this.formData.data, "tes----")
       }
     },
     methods: {
       handleAcademicYear(selectedValue) {
-        this.formData.academic_year = selectedValue;
+        this.formData.data.academic_year = selectedValue;
       },
       submitForm() {
         this.loadingUpdateSemester = true //progres btn
         this.error = {};
         //validation
         const requiredFields = ['semester_name', 'academic_year', 'start_date', 'end_date'];
+
         requiredFields.forEach(field => {
-          if (!this.formData[field]) {
+          if (!this.formData.data[field]) {
             this.error[field] = true;
             setTimeout(()=>{ this.loadingUpdateSemester = false },1000);
           }else{
@@ -169,11 +168,12 @@
             this.Toasttt('Successfully', 'success', 'Data Semester Successfully Updated')
             this.$emit('semesterUpdate'); //sent signal to views
             this.loadingUpdateSemester = false
+            this.errorMessages = [];
             return response
   
-        } catch (error) {
+        } catch (error) { 
           
-          if(error.response.message && error.response.status == 400){
+          if(error.response.data.message && error.response.status == 400){
             this.errorMessages = [];
             for (let field in error.response.data.message) { //list error 400
               this.errorMessages.push(...error.response.data.message[field]);
@@ -181,7 +181,7 @@
           }
           console.log(error)
         } finally { 
-          this.loadingSubmitSemester = false
+          this.loadingUpdateSemester = false
         }
   
       },
