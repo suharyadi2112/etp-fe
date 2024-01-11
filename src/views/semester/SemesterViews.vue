@@ -19,7 +19,7 @@
                   </div>
                 </div> 
                 <div class="col-2">
-                  <button type="button" class="btn btn-info btn-sm shadow" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="float: right;"><i class="bi bi-plus-circle"></i> add semester</button>
+                  <button type="button" class="btn btn-info btn-sm shadow AddSems" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bi bi-plus-circle"></i> add semester</button>
                   <SemesterModalAdd @semesterAdd="refreshData"> </SemesterModalAdd>
                 </div>
               </div>
@@ -76,7 +76,14 @@
                         <td nowrap="">{{ item.academic_year }}</td>
                         <td nowrap="">{{ item.start_date }}</td>
                         <td nowrap="">{{ item.end_date }}</td>
-                        <td nowrap="">{{ item.active_status }}</td>
+                        <td nowrap="">
+                          <span v-if="item.active_status == 'Active'" style="width: 80px;" class="badge rounded-pill text-bg-success">
+                            {{ item.active_status }}
+                          </span>
+                          <span v-else class="badge rounded-pill text-bg-danger" style="width: 80px">
+                            {{ item.active_status }}
+                          </span>
+                        </td>
                         <td>{{ item.description ? item.description : '-' }}</td>
                         <td nowrap="" style="text-align: center;">
                             <button @click="openUpdateSemester(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateSemester" :disabled="OpenUpdateSemesterBtn" >
@@ -129,6 +136,17 @@
   .breadJa{
     margin-top: 10px;
   }
+  /* ponsel */
+  @media screen and (max-width: 767px) { 
+    
+  }
+  /* dekstop */
+  @media screen and (min-width: 768px) {
+    .AddSems{
+      float: right;
+    }
+  }
+  
 </style>
 
 <script>
@@ -181,7 +199,7 @@ export default {
     async fetchData() {
       try {
         this.loading = true; //loading fetch
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // await new Promise(resolve => setTimeout(resolve, 1000));
         const response = await axios(`${this.baseUrl}/api/get_semester/`, {
           headers: {
             Authorization: `Bearer ${this.token}`
