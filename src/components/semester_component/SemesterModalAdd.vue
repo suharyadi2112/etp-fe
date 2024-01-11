@@ -13,7 +13,6 @@
             <div class="col-12">
               <div v-if="errorMessages.length > 0" class="alert alert-danger alert-dismissible fade show" role="alert">
                 <li v-for="(errorMessage, index) in errorMessages" :key="index"><i class="bi bi-exclamation-circle"></i> {{ errorMessage }}</li>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
             </div>
             <div class="col-md-3">
@@ -146,6 +145,7 @@ export default {
 
           this.Toasttt('Successfully', 'success', 'Data Semester Successfully Stored')
           this.$emit('semesterAdd'); //sent signal to views
+          this.errorMessages = [];
           return response
 
       } catch (error) {
