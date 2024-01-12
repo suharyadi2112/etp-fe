@@ -19,13 +19,13 @@
                   </div>
                 </div> 
                 <div class="col-2">
-                  <button type="button" class="btn btn-info btn-sm shadow" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="float: right;"><i class="bi bi-plus-circle"></i> add semester</button>
+                  <button type="button" class="btn btn-info btn-sm shadow AddSems" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bi bi-plus-circle"></i> add semester</button>
                   <SemesterModalAdd @semesterAdd="refreshData"> </SemesterModalAdd>
                 </div>
               </div>
               <!-- table -->
                 <div class="row">
-                  <div class="col-9 mb-0 pb-0 pt-2">
+                  <div class="col-6 mb-0 pb-0 pt-2">
                     <div class="dropdown">
                       <button class="btn btn-primary dropdown-toggle btn-sm shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Entries
@@ -37,11 +37,11 @@
                       </ul>
                     </div>
                   </div>
-                  <div class="col-3">
+                  <div class="col-6 GridSearchBox">
                     <form class="row p-0" @submit.prevent="searchData">
-                      <div class="input-group mb-3">
+                      <div class="input-group mb-3 Search ms-auto searchBox">
                         <input type="text" v-model="searchQuery" class="form-control shadow-sm" placeholder="Genap" aria-label="search" aria-describedby="button-addon2">
-                        <button class="btn btn-outline-primary shadow-sm" type="submit" id="button-addon2"><i class="bi bi-search"></i> search</button>
+                        <button class="btn btn-outline-primary shadow-sm searchBoxText" type="submit" id="button-addon2"><i class="bi bi-search"></i> search</button>
                       </div>
                     </form>
                   </div>
@@ -76,7 +76,14 @@
                         <td nowrap="">{{ item.academic_year }}</td>
                         <td nowrap="">{{ item.start_date }}</td>
                         <td nowrap="">{{ item.end_date }}</td>
-                        <td nowrap="">{{ item.active_status }}</td>
+                        <td nowrap="">
+                          <span v-if="item.active_status == 'Active'" style="width: 80px;" class="badge rounded-pill text-bg-success">
+                            {{ item.active_status }}
+                          </span>
+                          <span v-else class="badge rounded-pill text-bg-danger" style="width: 80px">
+                            {{ item.active_status }}
+                          </span>
+                        </td>
                         <td>{{ item.description ? item.description : '-' }}</td>
                         <td nowrap="" style="text-align: center;">
                             <button @click="openUpdateSemester(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateSemester" :disabled="OpenUpdateSemesterBtn" >
@@ -129,6 +136,34 @@
   .breadJa{
     margin-top: 10px;
   }
+  /* ponsel */
+  @media screen and (max-width: 767px) { 
+    .AddSems {
+      font-size: 0; 
+    }
+    .AddSems i {
+      font-size: 1rem; 
+    }
+    .searchBoxText i {
+      font-size: 1rem;
+    }
+    .searchBoxText {
+      font-size: 0;
+    }
+    .GridSearchBox {
+      padding-top: 8px;
+    }
+  }
+  /* dekstop */
+  @media screen and (min-width: 768px) {
+    .AddSems{
+      float: right;
+    }
+    .searchBox{
+      width: 50%;
+    }
+  }
+  
 </style>
 
 <script>
@@ -181,7 +216,7 @@ export default {
     async fetchData() {
       try {
         this.loading = true; //loading fetch
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // await new Promise(resolve => setTimeout(resolve, 1000));
         const response = await axios(`${this.baseUrl}/api/get_semester/`, {
           headers: {
             Authorization: `Bearer ${this.token}`

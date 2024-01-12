@@ -10,8 +10,8 @@
 
         <form @submit.prevent="submitForm">
           <div class="modal-body row g-3">
-            <div class="col-12">
-              <div v-if="errorMessages.length > 0" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="col-12" v-if="errorMessages.length > 0">
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <li v-for="(errorMessage, index) in errorMessages" :key="index"><i class="bi bi-exclamation-circle"></i> {{ errorMessage }}</li>
               </div>
             </div>
