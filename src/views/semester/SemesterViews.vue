@@ -25,7 +25,7 @@
               </div>
               <!-- table -->
                 <div class="row">
-                  <div class="col-9 mb-0 pb-0 pt-2">
+                  <div class="col-6 mb-0 pb-0 pt-2">
                     <div class="dropdown">
                       <button class="btn btn-primary dropdown-toggle btn-sm shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Entries
@@ -37,11 +37,11 @@
                       </ul>
                     </div>
                   </div>
-                  <div class="col-3">
+                  <div class="col-6 GridSearchBox">
                     <form class="row p-0" @submit.prevent="searchData">
-                      <div class="input-group mb-3">
+                      <div class="input-group mb-3 Search ms-auto searchBox">
                         <input type="text" v-model="searchQuery" class="form-control shadow-sm" placeholder="Genap" aria-label="search" aria-describedby="button-addon2">
-                        <button class="btn btn-outline-primary shadow-sm" type="submit" id="button-addon2"><i class="bi bi-search"></i> search</button>
+                        <button class="btn btn-outline-primary shadow-sm searchBoxText" type="submit" id="button-addon2"><i class="bi bi-search"></i> search</button>
                       </div>
                     </form>
                   </div>
@@ -138,12 +138,29 @@
   }
   /* ponsel */
   @media screen and (max-width: 767px) { 
-    
+    .AddSems {
+      font-size: 0; 
+    }
+    .AddSems i {
+      font-size: 1rem; 
+    }
+    .searchBoxText i {
+      font-size: 1rem;
+    }
+    .searchBoxText {
+      font-size: 0;
+    }
+    .GridSearchBox {
+      padding-top: 8px;
+    }
   }
   /* dekstop */
   @media screen and (min-width: 768px) {
     .AddSems{
       float: right;
+    }
+    .searchBox{
+      width: 50%;
     }
   }
   
