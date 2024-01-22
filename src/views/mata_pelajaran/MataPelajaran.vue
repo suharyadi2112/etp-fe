@@ -7,7 +7,7 @@
             <div class="card shadow">
               <div class="card-body p-4">
                 <div class="row">
-                  <div class="col-sm-10">
+                  <div class="col-sm-8">
                     <div class="pagetitle"> 
                       <h1 class="text-left">Mata Pelajaran</h1>
                       <nav>
@@ -18,8 +18,9 @@
                       </nav>
                     </div>
                   </div> 
-                  <div class="col-2">
-                    <button type="button" class="btn btn-info btn-sm shadow AddSems" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bi bi-plus-circle"></i> add pelajaran</button>
+                  <div class="col-4">
+                    <button type="button" class="btn btn-info btn-sm shadow AddMataPel" data-bs-toggle="modal" data-bs-target="#modalMataPel"><i class="bi bi-plus-circle"></i> add mata pelajaran</button>
+                    <MataPelajaranModalAdd @mataPelajaranAdd="refreshData"> </MataPelajaranModalAdd>
                   </div>
                 </div>
                 <!-- table -->
@@ -119,10 +120,10 @@
     }
     /* ponsel */
     @media screen and (max-width: 767px) { 
-      .AddSems {
+      .AddMataPel {
         font-size: 0; 
       }
-      .AddSems i {
+      .AddMataPel i {
         font-size: 1rem; 
       }
       .searchBoxText i {
@@ -137,7 +138,7 @@
     }
     /* dekstop */
     @media screen and (min-width: 768px) {
-      .AddSems{
+      .AddMataPel{
         float: right;
       }
       .searchBox{
@@ -149,9 +150,11 @@
   
   <script>
   import axios from 'axios';
+  import MataPelajaranModalAdd from '@/components/mata_pelajaran_component/MataPelajaranModalAdd.vue';
   
   export default {
     components:{
+      MataPelajaranModalAdd,
     },
     data() {
       return {
@@ -194,7 +197,7 @@
         try {
           this.loading = true; //loading fetch
           // await new Promise(resolve => setTimeout(resolve, 1000));
-          const response = await axios(`${this.baseUrl}/api/get_semester/`, {
+          const response = await axios(`${this.baseUrl}/api/get_mata_pelajaran/`, {
             headers: {
               Authorization: `Bearer ${this.token}`
             },
@@ -206,13 +209,9 @@
           });
   
           const datas = response.data;
-          datas.data.data = datas.data.data.map((item, index) => {
+          datas.data.data = datas.data.data.map((item, index) => { //nomor urut
             return {
               ...item,
-              // Nomor urut dimulai dari 1 untuk setiap halaman
-              // Anda dapat menghitung nomor urut dengan rumus (currentPage - 1) * selectedEntries + index + 1
-              // Misalnya, jika halaman pertama dan 5 entri per halaman, maka nomor urut = index + 1
-              // Jika halaman kedua, nomor urut = 5 + index + 1, dan seterusnya
               number: (this.currentPage - 1) * this.selectedEntries + index + 1,
             };
           });
