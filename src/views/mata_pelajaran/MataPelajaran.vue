@@ -56,6 +56,7 @@
                           <th scope="col">Tingkat</th>
                           <th scope="col">Code Pelajaran</th>
                           <th scope="col">Deskripsi</th>
+                          <th scope="col">Action</th>
                         </tr>
                       </thead>
                       <tbody class="table-group-divider">
@@ -69,10 +70,15 @@
                         </tr>
                         <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
                           <th scope="row" style="text-align: center;">{{ item.number }}</th>
-                          <td nowrap="">{{ item.subject_name }}</td>
+                          <td nowrap="">{{ capitalizeSubjectName(item.subject_name) }}</td>
                           <td nowrap="">{{ item.education_level }}</td>
                           <td nowrap="">{{ item.subject_code }}</td>
                           <td nowrap="">{{ item.subject_description ? item.subject_description : '-' }}</td>
+                          <td nowrap="" style="text-align: center;">
+                            <button @click="openUpdateMataPelajaran(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateMataPelajaran" :disabled="OpenUpdateMataPelajaranBtn" >
+                              <i class="bi bi-pencil"></i>
+                            </button>
+                        </td>
                         </tr>
                         <tr v-if="!loading && items.length === 0">
                           <td colspan="10" class="text-center">No results found.</td>
@@ -80,6 +86,7 @@
                       </tbody>
                     </table>
                   </div>
+                  <MataPelajaranModalUpdate @mataPelajaranUpdate="refreshData" :dataLoaded="FetchUpdateData" :dataFormUpdate="FormDataUpdate"> </MataPelajaranModalUpdate>
                   <!-- table -->
                   <div class="row">
                     <div class="col-9">
@@ -151,10 +158,12 @@
   <script>
   import axios from 'axios';
   import MataPelajaranModalAdd from '@/components/mata_pelajaran_component/MataPelajaranModalAdd.vue';
+  import MataPelajaranModalUpdate from '@/components/mata_pelajaran_component/MataPelajaranModalUpdate.vue';
   
   export default {
     components:{
       MataPelajaranModalAdd,
+      MataPelajaranModalUpdate,
     },
     data() {
       return {
@@ -172,7 +181,7 @@
         endEntryData: 0,
         totalItemsData : 0, 
   
-        OpenUpdateSemesterBtn : false,
+        OpenUpdateMataPelajaranBtn : false,
         FetchUpdateData : false,
   
         FormDataUpdate : {} //data for update
@@ -266,11 +275,11 @@
         this.fetchData();
       },
       // ------------------update section---------------------
-      async openUpdateSemester(id){
-        this.OpenUpdateSemesterBtn = true
+      async openUpdateMataPelajaran(id){
+        this.OpenUpdateMataPelajaranBtn = true
         this.FetchUpdateData = false
         try {
-            const response = await axios.get(`${this.baseUrl}/api/get_semester/${id}`,{
+            const response = await axios.get(`${this.baseUrl}/api/get_mata_pelajaran/${id}`,{
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
                 },
@@ -283,8 +292,11 @@
         } catch (error) {
           this.Toasttt("Server Error", "error", "")
         } finally { 
-          this.OpenUpdateSemesterBtn = false
+          this.OpenUpdateMataPelajaranBtn = false
         }
+      },
+      capitalizeSubjectName(subjectName) { //capital subject name
+        return subjectName.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
       },
       Toasttt(msg, type, detail){
         const Toast = this.$swal.mixin({
