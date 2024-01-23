@@ -86,7 +86,7 @@
                       </tbody>
                     </table>
                   </div>
-                  <MataPelajaranModalUpdate @mataPelajaranUpdate="refreshData" :dataLoaded="FetchUpdateData" :dataFormUpdate="FormDataUpdate"> </MataPelajaranModalUpdate>
+                  <MataPelajaranModalUpdate @mataPelajaranUpdate="refreshData" :dataLoaded="FetchUpdateData" :dataFormUpdateMatPel="FormDataUpdateMatPel"> </MataPelajaranModalUpdate>
                   <!-- table -->
                   <div class="row">
                     <div class="col-9">
@@ -184,7 +184,7 @@
         OpenUpdateMataPelajaranBtn : false,
         FetchUpdateData : false,
   
-        FormDataUpdate : {} //data for update
+        FormDataUpdateMatPel : {} //data for update
       }
     },
     mounted() {
@@ -286,7 +286,9 @@
             });
             
             this.FetchUpdateData = true //send info to child component update
-            this.FormDataUpdate = response.data //send data to child component
+            this.FormDataUpdateMatPel = response.data //send data to child component
+
+            console.log(this.FormDataUpdateMatPel, "hasil get")
             return response
             
         } catch (error) {
