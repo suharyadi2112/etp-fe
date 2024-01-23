@@ -8,6 +8,7 @@ import RolesDashboard from '../views/roles/RolesViews.vue'
 import PermissionDashboard from '../views/permission/PermissionViews.vue'
 //reference data
 import SemesterDashboard from '../views/semester/SemesterViews.vue'
+import MataPelajaranDashboard from '../views/mata_pelajaran/MataPelajaran.vue'
 
 //permission
 import NProgress from 'nprogress';
@@ -22,6 +23,7 @@ const routes = [
   { path: '/permission', name: 'permisdashboard', components: { default: PermissionDashboard }, meta: { requiresAuth: true } },
   //referencedata
   { path: '/semester', name: 'semesterdashboard', components: { default: SemesterDashboard }, meta: { requiresAuth: true } },
+  { path: '/mata-pelajaran', name: 'matapelajaran', components: { default: MataPelajaranDashboard }, meta: { requiresAuth: true } },
 ]
 
 
