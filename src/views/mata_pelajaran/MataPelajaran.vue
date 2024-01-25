@@ -19,8 +19,8 @@
                     </div>
                   </div> 
                   <div class="col-4">
-                    <button type="button" class="btn btn-info btn-sm shadow AddMataPel" data-bs-toggle="modal" data-bs-target="#modalMataPel"><i class="bi bi-plus-circle"></i> add mata pelajaran</button>
-                    <MataPelajaranModalAdd @mataPelajaranAdd="refreshData"> </MataPelajaranModalAdd>
+                    <button type="button" @click="getBaseMataPelajaran()" class="btn btn-info btn-sm shadow AddMataPel" data-bs-toggle="modal" data-bs-target="#modalMataPel"><i class="bi bi-plus-circle"></i> add mata pelajaran</button>
+                    <MataPelajaranModalAdd @mataPelajaranAdd="refreshData" :dataLoadedBaseMatPel="FetchAddDataBaseMatPel" :dataBaseList="ListBaseMatPel"> </MataPelajaranModalAdd>
                   </div>
                 </div>
                 <!-- table -->
@@ -183,8 +183,10 @@
   
         OpenUpdateMataPelajaranBtn : false,
         FetchUpdateData : false,
+        FetchAddDataBaseMatPel : false,
   
-        FormDataUpdateMatPel : {} //data for update
+        FormDataUpdateMatPel : {}, //data for update
+        ListBaseMatPel : {} 
       }
     },
     mounted() {
@@ -297,9 +299,31 @@
           this.OpenUpdateMataPelajaranBtn = false
         }
       },
+      
+      async getBaseMataPelajaran() { //get list base mata pelajaran
+        try {
+          this.FetchAddDataBaseMatPel = false
+            const response = await axios.get(`${this.baseUrl}/api/get_base_mata_pelajaran?page=&per_page=&search=`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`,
+                },
+            });
+
+            this.ListBaseMatPel = response.data.data.data
+            return response
+  
+        } catch (error) {
+          console.log(error.response.data.message)
+        } finally { 
+          this.FetchAddDataBaseMatPel = true
+        }
+      },
+
       capitalizeSubjectName(subjectName) { //capital subject name
         return subjectName.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
       },
+
       Toasttt(msg, type, detail){
         const Toast = this.$swal.mixin({
             toast: true,
