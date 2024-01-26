@@ -70,7 +70,7 @@
                         </tr>
                         <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
                           <th scope="row" style="text-align: center;">{{ item.number }}</th>
-                          <td nowrap="">{{ capitalizeSubjectName(item.subject_name) }}</td>
+                          <td nowrap="">{{ capitalizeSubjectName(item.basematapelajaran.base_subject_name) }}</td>
                           <td nowrap="">{{ item.education_level }}</td>
                           <td nowrap="">{{ item.subject_code }}</td>
                           <td nowrap="">{{ item.subject_description ? item.subject_description : '-' }}</td>
@@ -86,7 +86,7 @@
                       </tbody>
                     </table>
                   </div>
-                  <MataPelajaranModalUpdate @mataPelajaranUpdate="refreshData" :dataLoaded="FetchUpdateData" :dataFormUpdateMatPel="FormDataUpdateMatPel"> </MataPelajaranModalUpdate>
+                  <MataPelajaranModalUpdate @mataPelajaranUpdate="refreshData" :dataLoaded="FetchUpdateData"  :dataFormUpdateMatPel="FormDataUpdateMatPel" :dataBaseListForUpdate="ListBaseMatPel"> </MataPelajaranModalUpdate>
                   <!-- table -->
                   <div class="row">
                     <div class="col-9">
@@ -287,10 +287,13 @@
                 },
             });
             
-            this.FetchUpdateData = true //send info to child component update
             this.FormDataUpdateMatPel = response.data //send data to child component
-
-            console.log(this.FormDataUpdateMatPel, "hasil get")
+            //gunakan await agar tdk asycn
+            await this.getBaseMataPelajaran().then((GetBaseMatPelData) => {
+              if (GetBaseMatPelData.status == 200) {
+                  this.FetchUpdateData = true //send info to child component update
+              }
+            });
             return response
             
         } catch (error) {
@@ -309,14 +312,11 @@
                     'Authorization': `Bearer ${this.token}`,
                 },
             });
-
             this.ListBaseMatPel = response.data.data.data
+            this.FetchAddDataBaseMatPel = true
             return response
-  
         } catch (error) {
           console.log(error.response.data.message)
-        } finally { 
-          this.FetchAddDataBaseMatPel = true
         }
       },
 
