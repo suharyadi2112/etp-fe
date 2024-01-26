@@ -78,6 +78,9 @@
                             <button @click="openUpdateMataPelajaran(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateMataPelajaran" :disabled="OpenUpdateMataPelajaranBtn" >
                               <i class="bi bi-pencil"></i>
                             </button>
+                            <button @click="DeleteMataPelajaran(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteMataPelajaranBtn" >
+                              <i class="bi bi-trash"></i>
+                            </button>
                         </td>
                         </tr>
                         <tr v-if="!loading && items.length === 0">
@@ -186,7 +189,9 @@
         FetchAddDataBaseMatPel : false,
   
         FormDataUpdateMatPel : {}, //data for update
-        ListBaseMatPel : {} 
+        ListBaseMatPel : {},
+
+        DeleteMataPelajaranBtn : false,
       }
     },
     mounted() {
@@ -318,6 +323,51 @@
         } catch (error) {
           console.log(error.response.data.message)
         }
+      },
+
+      DeleteMataPelajaran(id){
+        this.$swal({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          showLoaderOnConfirm: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!",
+          preConfirm: async () => {
+            try {
+                this.DeleteMataPelajaranBtn = true
+                const response = await axios.delete(`${this.baseUrl}/api/del_mata_pelajaran/${id}`,  {
+                  headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                  },
+                });
+                
+                this.DeleteMataPelajaranBtn = false
+                return response
+
+              } catch (error) {
+                if (error.response && error.response.status == 400) {
+                  this.$swal.showValidationMessage(`
+                    Request failed: ${error.response.data.message}
+                  `);
+                }
+                console.error(error,"check error");
+              }
+          },
+          allowOutsideClick: () => !this.$swal.isLoading()
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.$swal.fire({
+              title: "Success!",
+              text: "Success Delete Data",
+              icon: "success",
+            }).then(() => {
+              this.refreshData()
+            })
+          }
+        });
       },
 
       capitalizeSubjectName(subjectName) { //capital subject name
