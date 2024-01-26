@@ -19,8 +19,8 @@
                     </div>
                   </div> 
                   <div class="col-4">
-                    <button type="button" class="btn btn-info btn-sm shadow AddMataPel" data-bs-toggle="modal" data-bs-target="#modalMataPel"><i class="bi bi-plus-circle"></i> add mata pelajaran</button>
-                    <MataPelajaranModalAdd @mataPelajaranAdd="refreshData"> </MataPelajaranModalAdd>
+                    <button type="button" @click="getBaseMataPelajaran()" class="btn btn-info btn-sm shadow AddMataPel" data-bs-toggle="modal" data-bs-target="#modalMataPel"><i class="bi bi-plus-circle"></i> add mata pelajaran</button>
+                    <MataPelajaranModalAdd @mataPelajaranAdd="refreshData" :dataLoadedBaseMatPel="FetchAddDataBaseMatPel" :dataBaseList="ListBaseMatPel"> </MataPelajaranModalAdd>
                   </div>
                 </div>
                 <!-- table -->
@@ -70,7 +70,7 @@
                         </tr>
                         <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
                           <th scope="row" style="text-align: center;">{{ item.number }}</th>
-                          <td nowrap="">{{ capitalizeSubjectName(item.subject_name) }}</td>
+                          <td nowrap="">{{ capitalizeSubjectName(item.basematapelajaran.base_subject_name) }}</td>
                           <td nowrap="">{{ item.education_level }}</td>
                           <td nowrap="">{{ item.subject_code }}</td>
                           <td nowrap="">{{ item.subject_description ? item.subject_description : '-' }}</td>
@@ -86,7 +86,7 @@
                       </tbody>
                     </table>
                   </div>
-                  <MataPelajaranModalUpdate @mataPelajaranUpdate="refreshData" :dataLoaded="FetchUpdateData" :dataFormUpdateMatPel="FormDataUpdateMatPel"> </MataPelajaranModalUpdate>
+                  <MataPelajaranModalUpdate @mataPelajaranUpdate="refreshData" :dataLoaded="FetchUpdateData"  :dataFormUpdateMatPel="FormDataUpdateMatPel" :dataBaseListForUpdate="ListBaseMatPel"> </MataPelajaranModalUpdate>
                   <!-- table -->
                   <div class="row">
                     <div class="col-9">
@@ -183,8 +183,10 @@
   
         OpenUpdateMataPelajaranBtn : false,
         FetchUpdateData : false,
+        FetchAddDataBaseMatPel : false,
   
-        FormDataUpdateMatPel : {} //data for update
+        FormDataUpdateMatPel : {}, //data for update
+        ListBaseMatPel : {} 
       }
     },
     mounted() {
@@ -285,10 +287,13 @@
                 },
             });
             
-            this.FetchUpdateData = true //send info to child component update
             this.FormDataUpdateMatPel = response.data //send data to child component
-
-            console.log(this.FormDataUpdateMatPel, "hasil get")
+            //gunakan await agar tdk asycn
+            await this.getBaseMataPelajaran().then((GetBaseMatPelData) => {
+              if (GetBaseMatPelData.status == 200) {
+                  this.FetchUpdateData = true //send info to child component update
+              }
+            });
             return response
             
         } catch (error) {
@@ -297,9 +302,28 @@
           this.OpenUpdateMataPelajaranBtn = false
         }
       },
+      
+      async getBaseMataPelajaran() { //get list base mata pelajaran
+        try {
+          this.FetchAddDataBaseMatPel = false
+            const response = await axios.get(`${this.baseUrl}/api/get_base_mata_pelajaran?page=&per_page=&search=`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`,
+                },
+            });
+            this.ListBaseMatPel = response.data.data.data
+            this.FetchAddDataBaseMatPel = true
+            return response
+        } catch (error) {
+          console.log(error.response.data.message)
+        }
+      },
+
       capitalizeSubjectName(subjectName) { //capital subject name
         return subjectName.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
       },
+
       Toasttt(msg, type, detail){
         const Toast = this.$swal.mixin({
             toast: true,

@@ -3,13 +3,19 @@
     <div class="modal fade" id="modalMataPel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Adding Mata Pelajaran</h1>
+          <div class="modal-header bg-primary">
+            <h1 class="modal-title fs-5 text-white" id="staticBackdropLabel">Adding Mata Pelajaran</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
   
           <form @submit.prevent="submitForm">
-            <div class="modal-body row g-3">
+            <div v-if="!hasLoadedBaseMatPel">
+              <div class="d-flex justify-content-center text-primary m-3">
+                <strong role="status" class="pt-1" style="padding-right: 2rem;">Retrieving Data...</strong>
+                <div class="spinner-border shadow" aria-hidden="true"></div>
+              </div>
+            </div>
+            <div  v-else class="modal-body row g-3">
               <div class="col-12" v-if="errorMessages.length > 0">
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                   <li v-for="(errorMessage, index) in errorMessages" :key="index"><i class="bi bi-exclamation-circle"></i> {{ errorMessage }}</li>
@@ -18,8 +24,13 @@
               <div class="col-md-6">
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
-                    <input type="text" :class="{ 'form-control': true, 'is-invalid': error.subject_name }" id="mataPelajaran" placeholder="Bahasa Indonesia" name="subject_name" v-model="formData.subject_name">
-                    <label for="mataPelajaran">Mata Pelajaran</label>
+                    <select :class="{ 'form-select': true, 'is-invalid': error.subject_name }" v-model="formData.subject_name" id="mataPelajaranName" aria-label="Floating label select example" name="subject_name">
+                        <option value="" selected>Choose...</option>
+                        <option v-for="subjectBaseMatPel in listOptionMatPel" :key="subjectBaseMatPel.id" :value="subjectBaseMatPel.id">
+                          {{ subjectBaseMatPel.base_subject_name }}
+                        </option>
+                    </select>
+                      <label for="mataPelajaranName">Mata Pelajaran</label>
                   </div>
                   <div v-if="error.subject_name" class="invalid-feedback">
                     Mata pelajaran harus diisi.
@@ -39,7 +50,7 @@
                         <option value="SMK">SMK</option>
                         <option value="MA">MA</option>
                       </select>
-                      <label for="mataPelajaranName">Tingkat Edukasi | {{ formData.education_level }}</label>
+                      <label for="mataPelajaranName">Tingkat Edukasi</label>
                   </div>
                   <div v-if="error.education_level" class="invalid-feedback">
                     Please select an option.
@@ -75,6 +86,18 @@
   
   export default {
     components: {
+    },
+    props: { //recieve data dari parents
+      dataLoadedBaseMatPel: Boolean,
+      dataBaseList : Object,
+    },
+    computed: {
+      hasLoadedBaseMatPel() {
+        return this.dataLoadedBaseMatPel;
+      },
+      listOptionMatPel() { //pakai computed/watcher untuk serve data langsung
+        return { ...this.dataBaseList };
+      }
     },
     data() {
       return {
@@ -137,7 +160,6 @@
         } finally { 
           this.loadingSubmitMataPelajaran = false
         }
-  
       },
       Toasttt(msg, type, detail){
         const Toast = this.$swal.mixin({
