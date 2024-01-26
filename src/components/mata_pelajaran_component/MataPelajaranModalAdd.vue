@@ -29,7 +29,7 @@
                         <option v-for="subjectBaseMatPel in listOptionMatPel" :key="subjectBaseMatPel.id" :value="subjectBaseMatPel.id">
                           {{ subjectBaseMatPel.base_subject_name }}
                         </option>
-                      </select>
+                    </select>
                       <label for="mataPelajaranName">Mata Pelajaran</label>
                   </div>
                   <div v-if="error.subject_name" class="invalid-feedback">
