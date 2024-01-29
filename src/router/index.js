@@ -9,6 +9,7 @@ import PermissionDashboard from '../views/permission/PermissionViews.vue'
 //reference data
 import SemesterDashboard from '../views/semester/SemesterViews.vue'
 import MataPelajaranDashboard from '../views/mata_pelajaran/MataPelajaran.vue'
+import BaseMatPelDashboard from '../views/base_mata_pelajaran/BaseMataPelajaran.vue'
 
 //permission
 import NProgress from 'nprogress';
@@ -24,6 +25,7 @@ const routes = [
   //referencedata
   { path: '/semester', name: 'semesterdashboard', components: { default: SemesterDashboard }, meta: { requiresAuth: true } },
   { path: '/mata-pelajaran', name: 'matapelajaran', components: { default: MataPelajaranDashboard }, meta: { requiresAuth: true } },
+  { path: '/base-mata-pelajaran', name: 'basematapelajaran', components: { default: BaseMatPelDashboard }, meta: { requiresAuth: true } },
 ]
 
 
