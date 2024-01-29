@@ -8,7 +8,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
   
-          <form @submit.prevent="submitForm">
+          <form @submit.prevent="submitFormUpdate">
             <div v-if="!dataLoaded">
               <div class="d-flex justify-content-center text-primary m-3">
                 <strong role="status" class="pt-1" style="padding-right: 2rem;">Retrieving Data...</strong>
@@ -121,7 +121,7 @@
       }
     },
     methods: {
-      submitForm() {
+      submitFormUpdate() {
         this.loadingSubmitMataPelajaran = true //progres btn
         this.error = {};
         //validation
