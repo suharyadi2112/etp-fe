@@ -38,6 +38,11 @@
             <i class="bi bi-circle"></i><span>Base Mata Pelajaran</span>
             </router-link>
         </li>
+        <li>
+            <router-link to="/base-kelas" class="nav-link collapsed">
+            <i class="bi bi-circle"></i><span>Base Kelas</span>
+            </router-link>
+        </li>
         </ul>
     </li>
 
