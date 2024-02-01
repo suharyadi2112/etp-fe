@@ -19,8 +19,8 @@
                     </div>
                   </div> 
                   <div class="col-4">
-                    <button type="button" class="btn btn-info btn-sm shadow AddBaseMataPel" data-bs-toggle="modal" data-bs-target="#modalBaseMataPel"><i class="bi bi-plus-circle"></i> add base kelas</button>
-                    <BaseMataPelajaranModalAdd @basemataPelajaranAdd="refreshData"> </BaseMataPelajaranModalAdd>
+                    <button type="button" class="btn btn-info btn-sm shadow AddBaseKelas" data-bs-toggle="modal" data-bs-target="#modalBaseKelas"><i class="bi bi-plus-circle"></i> add base kelas</button>
+                    <BaseKelasModalAdd @baseKelasAdd="refreshData"> </BaseKelasModalAdd>
                   </div>
                 </div>
                 <!-- table -->
@@ -48,11 +48,12 @@
                   </div>
                   <div class="table-responsive">
                     <table class="table table-hover table-bordered shadow-sm caption-top">
-                      <caption class="pb-2 pt-0">List of base mata pelajaran</caption>
+                      <caption class="pb-2 pt-0">List of base kelas</caption>
                       <thead class="table-primary">
                         <tr>
                           <th scope="col" style="text-align: center;">#</th>
-                          <th scope="col">Nama Base Pelajaran</th>
+                          <th scope="col">Nama Base Kelas</th>
+                          <th scope="col">Nama Ruang</th>
                           <th scope="col">Action</th>
                         </tr>
                       </thead>
@@ -67,12 +68,13 @@
                         </tr>
                         <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
                           <th scope="row" style="text-align: center;">{{ item.number }}</th>
-                          <td nowrap="">{{ capitalizeSubjectName(item.base_subject_name) }}</td>
+                          <td nowrap="">{{ capitalizeSubjectName(item.nama_kelas) }}</td>
+                          <td nowrap="">{{ capitalizeSubjectName(item.ruang_kelas) }}</td>
                           <td nowrap="" style="text-align: center;">
                             <button @click="openUpdateBaseMataPelajaran(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateBaseMataPelajaran" :disabled="OpenUpdateBaseMataPelajaranBtn" >
                               <i class="bi bi-pencil"></i>
                             </button>
-                            <button @click="DeleteBaseMataPelajaran(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteBaseMataPelajaranBtn" >
+                            <button @click="DeleteBaseKelas(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteBaseKelasBtn" >
                               <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -124,10 +126,10 @@
     }
     /* ponsel */
     @media screen and (max-width: 767px) { 
-      .AddBaseMataPel {
+      .AddBaseKelas {
         font-size: 0; 
       }
-      .AddBaseMataPel i {
+      .AddBaseKelas i {
         font-size: 1rem; 
       }
       .searchBoxText i {
@@ -142,7 +144,7 @@
     }
     /* dekstop */
     @media screen and (min-width: 768px) {
-      .AddBaseMataPel{
+      .AddBaseKelas{
         float: right;
       }
       .searchBox{
@@ -154,13 +156,13 @@
   
   <script>
   import axios from 'axios';
-  import BaseMataPelajaranModalAdd from '@/components/base_mata_pelajaran_component/BaseMatPelModalAdd.vue';
-  import BaseMataPelajaranModalUpdate from '@/components/base_mata_pelajaran_component/BaseMatPelModalUp.vue';
+  import BaseKelasModalAdd from '@/components/base_kelas_component/BaseKelasModalAdd.vue';
+  // import BaseMataPelajaranModalUpdate from '@/components/base_kelas_component/BaseMatPelModalUp.vue';
   
   export default {
     components:{
-      BaseMataPelajaranModalAdd,
-      BaseMataPelajaranModalUpdate,
+      BaseKelasModalAdd,
+      // BaseMataPelajaranModalUpdate,
     },
     data() {
       return {
@@ -183,7 +185,7 @@
   
         FormDataUpdateMatPel : {}, //data for update
 
-        DeleteBaseMataPelajaranBtn : false,
+        DeleteBaseKelasBtn : false,
       }
     },
     mounted() {
@@ -205,7 +207,7 @@
         try {
           this.loading = true; //loading fetch
           // await new Promise(resolve => setTimeout(resolve, 1000));
-          const response = await axios(`${this.baseUrl}/api/get_base_mata_pelajaran/`, {
+          const response = await axios(`${this.baseUrl}/api/get_base_kelas/`, {
             headers: {
               Authorization: `Bearer ${this.token}`
             },
@@ -295,7 +297,7 @@
         }
       },
 
-      DeleteBaseMataPelajaran(id){
+      DeleteBaseKelas(id){
         this.$swal({
           title: "Are you sure?",
           text: "You won't be able to revert this!",
@@ -307,14 +309,14 @@
           confirmButtonText: "Yes, delete it!",
           preConfirm: async () => {
             try {
-                this.DeleteBaseMataPelajaranBtn = true
-                const response = await axios.delete(`${this.baseUrl}/api/del_base_mata_pelajaran/${id}`,  {
+                this.DeleteBaseKelasBtn = true
+                const response = await axios.delete(`${this.baseUrl}/api/del_base_kelas/${id}`,  {
                   headers: {
                     'Authorization': `Bearer ${this.token}`,
                   },
                 });
                 
-                this.DeleteBaseMataPelajaranBtn = false
+                this.DeleteBaseKelasBtn = false
                 return response
 
               } catch (error) {
@@ -341,7 +343,8 @@
       },
 
       capitalizeSubjectName(subjectName) { //capital subject name
-        return subjectName.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+        // return subjectName.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+        return subjectName.replace(/\b\w/g, (match) => match.toUpperCase());
       },
 
       Toasttt(msg, type, detail){
