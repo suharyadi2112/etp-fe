@@ -71,7 +71,7 @@
                           <td nowrap="">{{ capitalizeSubjectName(item.nama_kelas) }}</td>
                           <td nowrap="">{{ capitalizeSubjectName(item.ruang_kelas) }}</td>
                           <td nowrap="" style="text-align: center;">
-                            <button @click="openUpdateBaseMataPelajaran(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateBaseMataPelajaran" :disabled="OpenUpdateBaseMataPelajaranBtn" >
+                            <button @click="openUpdateBaseKelas(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateBaseKelas" :disabled="OpenUpdateBaseKelasBtn" >
                               <i class="bi bi-pencil"></i>
                             </button>
                             <button @click="DeleteBaseKelas(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteBaseKelasBtn" >
@@ -85,7 +85,7 @@
                       </tbody>
                     </table>
                   </div>
-                  <BaseMataPelajaranModalUpdate @basemataPelajaranUpdate="refreshData" :dataLoaded="FetchUpdateData"  :dataFormUpdateBaseMatPel="FormDataUpdateMatPel"> </BaseMataPelajaranModalUpdate>
+                  <BaseKelasModalUpdate @baseKelasUpdate="refreshData" :dataLoaded="FetchUpdateData"  :dataFormUpdateBaseMatPel="FormDataUpdateKelas"> </BaseKelasModalUpdate>
                   <!-- table -->
                   <div class="row">
                     <div class="col-9">
@@ -157,12 +157,12 @@
   <script>
   import axios from 'axios';
   import BaseKelasModalAdd from '@/components/base_kelas_component/BaseKelasModalAdd.vue';
-  // import BaseMataPelajaranModalUpdate from '@/components/base_kelas_component/BaseMatPelModalUp.vue';
+  import BaseKelasModalUpdate from '@/components/base_kelas_component/BaseKelasModalUp.vue';
   
   export default {
     components:{
       BaseKelasModalAdd,
-      // BaseMataPelajaranModalUpdate,
+      BaseKelasModalUpdate,
     },
     data() {
       return {
@@ -180,10 +180,10 @@
         endEntryData: 0,
         totalItemsData : 0, 
   
-        OpenUpdateBaseMataPelajaranBtn : false,
+        OpenUpdateBaseKelasBtn : false,
         FetchUpdateData : false,
   
-        FormDataUpdateMatPel : {}, //data for update
+        FormDataUpdateKelas : {}, //data for update
 
         DeleteBaseKelasBtn : false,
       }
@@ -276,24 +276,24 @@
         this.fetchData();
       },
       // ------------------update section---------------------
-      async openUpdateBaseMataPelajaran(id){
-        this.OpenUpdateBaseMataPelajaranBtn = true
+      async openUpdateBaseKelas(id){
+        this.OpenUpdateBaseKelasBtn = true
         this.FetchUpdateData = false
         try {
-            const response = await axios.get(`${this.baseUrl}/api/get_base_mata_pelajaran/${id}`,{
+            const response = await axios.get(`${this.baseUrl}/api/get_base_kelas/${id}`,{
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
                 },
             });
             
-            this.FormDataUpdateMatPel = response.data //send data to child component
+            this.FormDataUpdateKelas = response.data //send data to child component
             this.FetchUpdateData = true
             return response
             
         } catch (error) {
           this.Toasttt("Server Error", "error", "")
         } finally { 
-          this.OpenUpdateBaseMataPelajaranBtn = false
+          this.OpenUpdateBaseKelasBtn = false
         }
       },
 

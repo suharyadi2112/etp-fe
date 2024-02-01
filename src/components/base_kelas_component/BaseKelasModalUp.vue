@@ -1,25 +1,32 @@
-<!-- ModalFormAddBaseKelas -->
+<!-- ModalFormUpdatebaseKelas -->
 <template>
-    <div class="modal fade" id="modalBaseKelas" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="updateBaseKelas" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header bg-primary">
-            <h1 class="modal-title fs-5 text-white" id="staticBackdropLabel">Adding Base Kelas</h1>
+          <div class="modal-header bg-info">
+            <h1 class="modal-title fs-5 text-white" id="staticBackdropLabel">Update Base Kelas</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
   
-          <form @submit.prevent="submitFormBaseKelas">
-            <div class="modal-body row g-3">
+          <form @submit.prevent="submitFormUpdateBaseKelas">
+            <div v-if="!dataLoaded">
+              <div class="d-flex justify-content-center text-primary m-3">
+                <strong role="status" class="pt-1" style="padding-right: 2rem;">Retrieving Data...</strong>
+                <div class="spinner-border shadow" aria-hidden="true"></div>
+              </div>
+            </div>
+            <div  v-else class="modal-body row g-3">
               <div class="col-12" v-if="errorMessages.length > 0">
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                   <li v-for="(errorMessage, index) in errorMessages" :key="index"><i class="bi bi-exclamation-circle"></i> {{ errorMessage }}</li>
                 </div>
               </div>
+              
               <div class="col-md-6">
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
                     <form class="form-floating">
-                        <input type="text" :class="{ 'form-control': true,'is-invalid': error.nama_kelas }"  id="basematpel" placeholder="IPA" v-model="formData.nama_kelas" name="nama_kelas">
+                        <input type="text" :class="{ 'form-control': true,'is-invalid': error.nama_kelas }"  id="basematpel" placeholder="IPA" v-model="formData.data.nama_kelas" name="nama_kelas">
                         <label for="basematpel">Nama Base Kelas</label>
                     </form>
                   </div>
@@ -33,7 +40,7 @@
                 <div class="input-group has-validation">
                     <div class="form-floating is-invalid">
                         <form class="form-floating">
-                            <input type="text" :class="{ 'form-control': true,'is-invalid': error.ruang_kelas }"  id="basematpel" placeholder="Kimia" v-model="formData.ruang_kelas" name="ruang_kelas">
+                            <input type="text" :class="{ 'form-control': true,'is-invalid': error.ruang_kelas }"  id="basematpel" placeholder="Kimia" v-model="formData.data.ruang_kelas" name="ruang_kelas">
                             <label for="basematpel">Nama Ruang</label>
                         </form>
                     </div>
@@ -42,15 +49,15 @@
                     </div>
                 </div>
               </div>
-
+  
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button class="btn btn-primary" style="float: right;" type="submit" :disabled="loadingSubmitBaseKelas">
-                <span v-if="!loadingSubmitBaseKelas"><i class="bi bi-arrow-repeat"></i> Submit Base Kelas</span>
+                <span v-if="!loadingSubmitBaseKelas"><i class="bi bi-arrow-repeat"></i> Update Base Kelas</span>
                 <span v-else>
                   <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                  <label> Submit Base Kelas</label>
+                  <label> Update Base Kelas</label>
                 </span>
               </button>
             </div>
@@ -64,27 +71,47 @@
   import axios from 'axios';
   
   export default {
-    components: {},
+    components: {
+      
+    },
+    props: { //recieve data dari parents
+      dataLoaded: Boolean,
+      dataFormUpdateBaseMatPel: Object, 
+    },
+    computed: {
+      hasLoaded() {
+        return this.dataLoaded;
+      },
+   
+    },
     data() {
       return {
         baseUrl: process.env.BE_APP_BASE_URL,
         token: localStorage.getItem('tokenETP'),
-        formData: {
-          base_subject_name:'',
-        },
+        formData: { ...this.dataFormUpdateBaseMatPel },
         error : {},//error clientside
         loadingSubmitBaseKelas : false, //progres btn
         errorMessages: [],//error serverside
       }
     },
+    watch: {
+      dataFormUpdateBaseMatPel(newData) {
+        this.formData = { ...newData,
+          data: {
+            ...newData.data
+          }
+        };
+      }
+    },
     methods: {
-      submitFormBaseKelas() {
+      submitFormUpdateBaseKelas() {
         this.loadingSubmitBaseKelas = true //progres btn
         this.error = {};
         //validation
-        const requiredFields = ['nama_kelas', 'ruang_kelas'];
-        requiredFields.forEach(field => { 
-          if (!this.formData[field]) {
+        const requiredFields = ['nama_kelas'];
+
+        requiredFields.forEach(field => {
+          if (!this.formData.data[field]) {
             this.error[field] = true;
             setTimeout(()=>{ this.loadingSubmitBaseKelas = false },1000);
           }else{
@@ -93,34 +120,37 @@
         });
         const hasErrors = requiredFields.some(field => this.error[field]);
         if (!hasErrors) {
-          this.sendStoreBaseKelas();
+          this.sendUpdateMatPel();
         }
       },
-      async sendStoreBaseKelas() {
+      async sendUpdateMatPel() {
         try {
-            const response = await axios.post(`${this.baseUrl}/api/store_base_kelas`, this.formData, {
+            const response = await axios.put(`${this.baseUrl}/api/update_base_kelas/${this.formData.data.id}`, this.formData.data, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.token}`,
                 },
             });
   
-            this.Toasttt('Successfully', 'success', 'Data Base Kelas Successfully Stored')
-            this.$emit('baseKelasAdd'); //sent signal to views
+            this.Toasttt('Successfully', 'success', 'Data Base Kelas Successfully Updated')
+            this.$emit('baseKelasUpdate'); //sent signal to views
+            this.loadingSubmitBaseKelas = false
             this.errorMessages = [];
             return response
   
-        } catch (error) {
+        } catch (error) { 
+          
           if(error.response.data.message && error.response.status == 400){
             this.errorMessages = [];
             for (let field in error.response.data.message) { //list error 400
               this.errorMessages.push(...error.response.data.message[field]);
             }
           }
-          console.log(error.response.data.message)
+          console.log(error)
         } finally { 
           this.loadingSubmitBaseKelas = false
         }
+  
       },
       Toasttt(msg, type, detail){
         const Toast = this.$swal.mixin({
