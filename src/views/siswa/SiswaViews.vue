@@ -19,8 +19,8 @@
                   </div>
                 </div> 
                 <div class="col-2">
-                  <button type="button" class="btn btn-info btn-sm shadow AddSems" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><i class="bi bi-plus-circle"></i> add siswa</button>
-                  <SemesterModalAdd @semesterAdd="refreshData"> </SemesterModalAdd>
+                  <button type="button" class="btn btn-info btn-sm shadow AddSiswa" data-bs-toggle="modal" data-bs-target="#modalSiswa"><i class="bi bi-plus-circle"></i> add siswa</button>
+                  <SiswaModalAdd @siswaAdd="refreshData"> </SiswaModalAdd>
                 </div>
               </div>
               <!-- table -->
@@ -56,8 +56,7 @@
                         <th scope="col">Nama</th>
                         <th scope="col">Kelas</th>
                         <th scope="col">Alamat</th>
-                        <th scope="col">Jenis Kelamin</th>
-                        <th scope="col">Tanggal Lahir</th>
+                        <th scope="col">JK - TL</th>
                         <th scope="col">No Telp</th>
                         <th scope="col">Status</th>
                         <th scope="col">Action</th>
@@ -75,18 +74,24 @@
                       <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
                         <th scope="row" style="text-align: center;">{{ item.number }}</th>
                         <td nowrap="">{{ item.nis }}</td>
-                        <td nowrap="">{{ item.nama }}</td>
+                        <td style="text-align: left; width:50%;" @click="toggleExpandName(item.id)">
+                          <span v-if="!expandedName.includes(item.id)">
+                            {{ shortenName(item.nama) }}
+                          </span>
+                          <span v-else>
+                            {{ item.nama }}
+                          </span>
+                        </td>
                         <td nowrap="">{{ item.basekelas.nama_kelas }}</td>
-                        <td style="width: 50%" @click="toggleExpand(item.id)">
-                          <span v-if="!expandedIds.includes(item.id)">
+                        <td style="text-align: justify; width:50%;" @click="toggleExpand(item.id)">
+                          <span  v-if="!expandedIds.includes(item.id)">
                             {{ shortenAddress(item.address) }}
                           </span>
                           <span v-else>
                             {{ item.address }}
                           </span>
                         </td>
-                        <td nowrap="">{{ item.gender }}</td>
-                        <td nowrap="">{{ item.birth_date }}</td>
+                        <td nowrap=""  style="text-align: center;">{{ item.gender }} <hr> {{ item.birth_date }}</td>
                         <td nowrap="">{{ item.phone_number }}</td>
                         <td nowrap="">
                           <span v-if="item.status == 'Active'" style="width: 60px;" class="badge rounded-pill text-bg-success">
@@ -151,12 +156,16 @@
   .breadJa{
     margin-top: 10px;
   }
+  hr {
+      margin-top: 2px;
+      margin-bottom: 2px;
+  }
   /* ponsel */
   @media screen and (max-width: 767px) { 
-    .AddSems {
+    .AddSiswa {
       font-size: 0; 
     }
-    .AddSems i {
+    .AddSiswa i {
       font-size: 1rem; 
     }
     .searchBoxText i {
@@ -171,7 +180,7 @@
   }
   /* dekstop */
   @media screen and (min-width: 768px) {
-    .AddSems{
+    .AddSiswa{
       float: right;
     }
     .searchBox{
@@ -182,13 +191,13 @@
 </style>
 
 <script>
-import SemesterModalAdd from '@/components/semester_component/SemesterModalAdd.vue';
+import SiswaModalAdd from '@/components/siswa_component/SiswaModalAdd.vue';
 import SemesterModalUpdate from '@/components/semester_component/SemesterModalUpdate.vue';
 import axios from 'axios';
 
 export default {
   components:{
-    SemesterModalAdd,
+    SiswaModalAdd,
     SemesterModalUpdate,
   },
   data() {
@@ -212,7 +221,8 @@ export default {
 
       FormDataUpdate : {}, //data for update
 
-      expandedIds: []
+      expandedIds: [], //address expand
+      expandedName: [], //address expand
     }
   },
   mounted() {
@@ -309,9 +319,16 @@ export default {
 
     shortenAddress(address) {
       if (address.length > 40) {
-        return address.substring(0, 40) + ' ...'; // Potong alamat jika lebih dari 40 karakter
+        return address.substring(0, 40) + ' ... '; // Potong alamat jika lebih dari 40 karakter
       } else {
         return address;
+      }
+    },
+    shortenName(name) {
+      if (name.length > 20) {
+        return name.substring(0, 20) + ' ... '; 
+      } else {
+        return name;
       }
     },
     toggleExpand(itemId) {
@@ -319,6 +336,13 @@ export default {
         this.expandedIds = this.expandedIds.filter(id => id !== itemId);
       } else {
         this.expandedIds.push(itemId);
+      }
+    },
+    toggleExpandName(itemId) {
+      if (this.expandedName.includes(itemId)) {
+        this.expandedName = this.expandedName.filter(id => id !== itemId);
+      } else {
+        this.expandedName.push(itemId);
       }
     },
 
