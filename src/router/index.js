@@ -11,6 +11,7 @@ import SemesterDashboard from '../views/semester/SemesterViews.vue'
 import MataPelajaranDashboard from '../views/mata_pelajaran/MataPelajaran.vue'
 import BaseMatPelDashboard from '../views/base_mata_pelajaran/BaseMataPelajaran.vue'
 import BaseKelasDashboard from '../views/base_kelas/BaseKelas.vue'
+import SiswaDashboard from '../views/siswa/SiswaViews.vue'
 
 //permission
 import NProgress from 'nprogress';
@@ -28,6 +29,8 @@ const routes = [
   { path: '/mata-pelajaran', name: 'matapelajaran', components: { default: MataPelajaranDashboard }, meta: { requiresAuth: true } },
   { path: '/base-mata-pelajaran', name: 'basematapelajaran', components: { default: BaseMatPelDashboard }, meta: { requiresAuth: true } },
   { path: '/base-kelas', name: 'basekelas', components: { default: BaseKelasDashboard }, meta: { requiresAuth: true } },
+  //siswa
+  { path: '/siswa', name: 'siswadashboard', components: { default: SiswaDashboard }, meta: { requiresAuth: true } },
 ]
 
 
