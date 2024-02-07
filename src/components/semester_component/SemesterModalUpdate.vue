@@ -3,12 +3,12 @@
     <div class="modal fade" id="updateSemester" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Update Semester</h1>
+          <div class="modal-header bg-info">
+            <h1 class="modal-title fs-5 text-white" id="staticBackdropLabel">Update Semester</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
   
-          <form @submit.prevent="submitForm">
+          <form @submit.prevent="submitForm"> 
             <div v-if="!hasLoaded">
               <div class="d-flex justify-content-center text-primary m-3">
                 <strong role="status" class="pt-1" style="padding-right: 2rem;">Retrieving Data...</strong>

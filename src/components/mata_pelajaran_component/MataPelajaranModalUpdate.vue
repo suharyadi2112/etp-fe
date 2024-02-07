@@ -42,13 +42,13 @@
                   <div class="form-floating is-invalid">
                     <select :class="{ 'form-select': true, 'is-invalid': error.education_level }" v-model="formData.data.education_level" id="mataPelajaranName" aria-label="Floating label select example" name="education_level">
                         <option value="" selected>Choose...</option>
-                        <option value="SD">SD</option>
-                        <option value="MI">MI</option>
-                        <option value="SMP">SMP</option>
-                        <option value="MTS">MTS</option>
-                        <option value="SMA">SMA</option>
-                        <option value="SMK">SMK</option>
-                        <option value="MA">MA</option>
+                        <option value="sd">SD</option>
+                        <option value="mi">MI</option>
+                        <option value="smp">SMP</option>
+                        <option value="mts">MTS</option>
+                        <option value="sma">SMA</option>
+                        <option value="smk">SMK</option>
+                        <option value="ma">MA</option>
                       </select>
                       <label for="mataPelajaranName">Tingkat Edukasi | {{ formData.data.education_level }}</label>
                   </div>
