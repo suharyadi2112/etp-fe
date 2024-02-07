@@ -43,6 +43,12 @@
             <i class="bi bi-circle"></i><span>Base Kelas</span>
             </router-link>
         </li>
+        <li>
+            <router-link to="/siswa" class="nav-link collapsed">
+            <i class="bi bi-circle"></i><span>Siswa</span>
+            </router-link>
+        </li>
+        
         </ul>
     </li>
 
