@@ -9,27 +9,20 @@
           </div>
   
           <form @submit.prevent="submitFormSiswa">
-            <div class="modal-body row g-3">
+          <div v-if="!hasLoadedSiswa">
+              <div class="d-flex justify-content-center text-primary m-3">
+                <strong role="status" class="pt-1" style="padding-right: 2rem;">Retrieving Data...</strong>
+                <div class="spinner-border shadow" aria-hidden="true"></div>
+              </div>
+            </div>
+            <div v-else class="modal-body row g-3">
               <div class="col-12" v-if="errorMessages.length > 0">
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                   <li v-for="(errorMessage, index) in errorMessages" :key="index"><i class="bi bi-exclamation-circle"></i> {{ errorMessage }}</li>
                 </div>
               </div>
-              <div class="col-md-4">
-                <div class="input-group has-validation">
-                  <div class="form-floating is-invalid">
-                    <form class="form-floating">
-                        <input type="number" :class="{ 'form-control': true,'is-invalid': error.nis }" id="nis" placeholder="1232123211" v-model="formData.nis" name="nis" >
-                        <label for="nis">NIS</label>
-                    </form>
-                  </div>
-                  <div v-if="error.nis" class="invalid-feedback">
-                    NIS harus diisi.
-                  </div>
-                </div>
-              </div>
 
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
                     <form class="form-floating">
@@ -43,19 +36,111 @@
                 </div>
               </div>
 
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <div class="input-group has-validation">
-                    <div class="form-floating is-invalid">
-                        <form class="form-floating">
-                            <input type="text" :class="{ 'form-control': true,'is-invalid': error.ruang_kelas }"  id="basematpel" placeholder="Kimia" v-model="formData.ruang_kelas" name="ruang_kelas">
-                            <label for="basematpel">Nama Ruang</label>
-                        </form>
+                  <div class="form-floating is-invalid">
+                    <form class="form-floating">
+                        <input type="number" :class="{ 'form-control': true,'is-invalid': error.nis }" id="nis" placeholder="1232123211" v-model="formData.nis" name="nis" >
+                        <label for="nis">NIS</label>
+                    </form>
+                  </div>
+                  <div v-if="error.nis" class="invalid-feedback">
+                    NIS harus diisi.
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div class="input-group has-validation">
+                
+                  <div class="form-floating is-invalid">
+                    <select :class="{ 'form-select': true, 'is-invalid': error.id_kelas }" v-model="formData.id_kelas" id="nama_kelas_name" aria-label="Floating label" name="nama_kelas">
+                        <option value="" selected>Choose...</option>
+                        <option v-for="namaKelas in listOptionKelas" :key="namaKelas.id" :value="namaKelas.id">
+                          {{ namaKelas.nama_kelas }}
+                        </option>
+                    </select>
+                    <label for="nama_kelas_name">Nama Kelas</label>
                     </div>
-                    <div v-if="error.ruang_kelas" class="invalid-feedback">
-                        Nama Ruang harus diisi.
+
+                    <div v-if="error.id_kelas" class="invalid-feedback">
+                        Nama Kelas harus diisi.
                     </div>
                 </div>
               </div>
+
+              <div class="col-md-4">
+                <div class="input-group has-validation">
+                  <div class="form-floating is-invalid">
+                    <form class="form-floating">
+                        <input type="number" :class="{ 'form-control': true,'is-invalid': error.phone_number }" id="phone_number" placeholder="1232123211" v-model="formData.phone_number" name="phone_number" >
+                        <label for="phone_number">Nomor Telepon</label>
+                    </form>
+                  </div>
+                  <div v-if="error.nis" class="invalid-feedback">
+                    Nomor telepon harus diisi.
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="statusSiswa" v-model="formData.status">
+                  <label class="form-check-label" for="statusSiswa">Status</label>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div class="input-group has-validation">
+                  <div class="form-floating is-invalid">
+                      <select :class="{ 'form-select': true, 'is-invalid': error.gender }" v-model="formData.gender" id="gender_name" aria-label="Floating label" name="gender">
+                          <option value="" selected>Choose...</option>
+                          <option value="Laki-laki" >Laki-laki</option>
+                          <option value="Perempuan" >Perempuan</option>
+                      </select>
+                      
+                      <label for="gender_name">Jenis Kelamin</label>
+                  </div>
+                  <div v-if="error.gender" class="invalid-feedback">
+                    Jenis kelamin harus diisi.
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <div class="input-group has-validation">
+                  <div class="form-floating is-invalid">
+                    <form class="form-floating">
+                        <input type="date" :class="{ 'form-control': true,'is-invalid': error.birth_date }"  id="birth_date" v-model="formData.birth_date" name="birth_date">
+                        <label for="birth_date">Tanggal Lahir</label>
+                    </form>
+                  </div>
+                  <div v-if="error.birth_date" class="invalid-feedback">
+                    Tanggal lahir harus diisi.
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-floating is-invalid">
+                  <textarea :class="{ 'form-control': true, 'is-invalid': error.birth_place }" placeholder="Tempat lahir....."  v-model="formData.birth_place" id="birth_place" style="height: 100px" name="birth_place"></textarea>
+                  <label for="birth_place">Tempat Lahir</label>
+                </div>
+                <div v-if="error.birth_place" class="invalid-feedback">
+                  Tempat lahir harus diisi.
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-floating is-invalid">
+                  <textarea :class="{ 'form-control': true, 'is-invalid': error.address }" placeholder="Alamat tempat tinggal....."  v-model="formData.address" id="address" style="height: 100px" name="address"></textarea>
+                  <label for="address">Alamat tempat tinggal</label>
+                </div>
+                <div v-if="error.address" class="invalid-feedback">
+                  Address harus diisi.
+                </div>
+              </div>
+
 
             </div>
             <div class="modal-footer">
@@ -78,13 +163,33 @@
   import axios from 'axios';
   
   export default {
-    components: {},
+    components: { },
+    props: {
+      dataListKelas : Object,
+      dataLoadedKelas: Boolean,
+    },
+    computed: {
+      hasLoadedSiswa() {
+        return this.dataLoadedKelas;
+      },
+      listOptionKelas() { //pakai computed/watcher untuk serve data langsung
+        return { ...this.dataListKelas };
+      },
+    },
     data() {
       return {
         baseUrl: process.env.BE_APP_BASE_URL,
         token: localStorage.getItem('tokenETP'),
         formData: {
-          base_subject_name:'',
+          nis:'',
+          nama:'',
+          gender:'',
+          birth_date:'',
+          birth_place:'',
+          address:'',
+          phone_number:'',
+          id_kelas:'',
+          status: '',
         },
         error : {},//error clientside
         loadingSubmitSiswa : false, //progres btn
@@ -96,8 +201,10 @@
         this.loadingSubmitSiswa = true //progres btn
         this.error = {};
         //validation
-        const requiredFields = ['nama_kelas', 'ruang_kelas'];
+        const requiredFields = ['nis', 'nama','gender','birth_date','birth_place','address','phone_number','id_kelas'];
         requiredFields.forEach(field => { 
+          
+          console.log(this.formData[field])
           if (!this.formData[field]) {
             this.error[field] = true;
             setTimeout(()=>{ this.loadingSubmitSiswa = false },1000);
