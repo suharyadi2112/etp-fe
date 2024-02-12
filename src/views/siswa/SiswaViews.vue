@@ -106,9 +106,9 @@
                               <i class="bi bi-pencil"></i>
                             </button>
 
-                            <!-- <button @click="DeleteBaseKelas(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteBaseKelasBtn" >
+                            <button @click="DeleteSiswa(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteSiswaBtn" >
                               <i class="bi bi-trash"></i>
-                            </button> -->
+                            </button>
                         </td>
                       </tr>
                       <tr v-if="!loading && items.length === 0">
@@ -226,6 +226,7 @@ export default {
       
       ListKelas : {},
       FetchAddDataKelas : false,
+      DeleteSiswaBtn : false,
     }
   },
   mounted() {
@@ -386,6 +387,51 @@ export default {
       } finally { 
         this.OpenUpdateSemesterBtn = false
       }
+    },
+
+    DeleteSiswa(id){
+      this.$swal({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        showLoaderOnConfirm: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        preConfirm: async () => {
+          try {
+              this.DeleteSiswaBtn = true
+              const response = await axios.delete(`${this.baseUrl}/api/del_siswa/${id}`,  {
+                headers: {
+                  'Authorization': `Bearer ${this.token}`,
+                },
+              });
+              
+              this.DeleteSiswaBtn = false
+              return response
+
+            } catch (error) {
+              if (error.response && error.response.status == 400) {
+                this.$swal.showValidationMessage(`
+                  Request failed: ${error.response.data.message}
+                `);
+              }
+              console.error(error,"check error");
+            }
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$swal.fire({
+            title: "Success!",
+            text: "Success Delete Data",
+            icon: "success",
+          }).then(() => {
+            this.refreshData()
+          })
+        }
+      });
     },
     
     Toasttt(msg, type, detail){
