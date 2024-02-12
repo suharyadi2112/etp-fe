@@ -55,7 +55,6 @@
                         <th scope="col">Nis</th>
                         <th scope="col">Nama</th>
                         <th scope="col">Kelas</th>
-                        <th scope="col">Alamat</th>
                         <th scope="col">JK - TL</th>
                         <th scope="col">No Telp</th>
                         <th scope="col">Status</th>
@@ -74,7 +73,7 @@
                       <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
                         <th scope="row" style="text-align: center;">{{ item.number }}</th>
                         <td nowrap="">{{ item.nis }}</td>
-                        <td style="text-align: left; width:50%;" @click="toggleExpandName(item.id)">
+                        <td style="text-align: left; width:20%;" @click="toggleExpandName(item.id)">
                           <span v-if="!expandedName.includes(item.id)">
                             {{ shortenName(item.nama) }}
                           </span>
@@ -83,14 +82,6 @@
                           </span>
                         </td>
                         <td nowrap="">{{ item.basekelas.nama_kelas }}</td>
-                        <td style="text-align: justify; width:50%;" @click="toggleExpand(item.id)">
-                          <span  v-if="!expandedIds.includes(item.id)">
-                            {{ shortenAddress(item.address) }}
-                          </span>
-                          <span v-else>
-                            {{ item.address }}
-                          </span>
-                        </td>
                         <td nowrap=""  style="text-align: center;">{{ item.gender }} <hr> {{ item.birth_date }}</td>
                         <td nowrap="">{{ item.phone_number }}</td>
                         <td nowrap="" style="text-align: center;">
@@ -102,11 +93,18 @@
                           </span>
                         </td>
                         <td nowrap="" style="text-align: center;">
-                            <button @click="openUpdateSiswa(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateSiswa" :disabled="OpenUpdateSiswaBtn" >
+                            
+                            <router-link :to="'/detail-siswa/' + item.id">
+                              <button class="btn btn-info btn-sm m-1 shadow" title="Detail">
+                                <i class="bi bi-eye text-white"></i>
+                              </button>
+                            </router-link>
+                            
+                            <button @click="openUpdateSiswa(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateSiswa" :disabled="OpenUpdateSiswaBtn" title="Update">
                               <i class="bi bi-pencil"></i>
                             </button>
 
-                            <button @click="DeleteSiswa(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteSiswaBtn" >
+                            <button @click="DeleteSiswa(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteSiswaBtn" title="Delete">
                               <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -222,7 +220,6 @@ export default {
       FormDataUpdate : {}, //data for update
       GetKelas : {}, //data for kelas list
 
-      expandedIds: [], //address expand
       expandedName: [], //address expand
       
       ListKelas : {},
@@ -321,26 +318,11 @@ export default {
     refreshData(){
       this.fetchData();
     },
-
-    shortenAddress(address) {
-      if (address.length > 40) {
-        return address.substring(0, 40) + ' ... '; // Potong alamat jika lebih dari 40 karakter
-      } else {
-        return address;
-      }
-    },
     shortenName(name) {
       if (name.length > 20) {
         return name.substring(0, 20) + ' ... '; 
       } else {
         return name;
-      }
-    },
-    toggleExpand(itemId) {
-      if (this.expandedIds.includes(itemId)) {
-        this.expandedIds = this.expandedIds.filter(id => id !== itemId);
-      } else {
-        this.expandedIds.push(itemId);
       }
     },
     toggleExpandName(itemId) {
@@ -350,7 +332,6 @@ export default {
         this.expandedName.push(itemId);
       }
     },
-
     async getListKelas() { //get list base mata pelajaran
         try {
           this.FetchAddDataKelas = false
