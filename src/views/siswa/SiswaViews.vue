@@ -19,8 +19,8 @@
                   </div>
                 </div> 
                 <div class="col-2">
-                  <button type="button" class="btn btn-info btn-sm shadow AddSiswa" data-bs-toggle="modal" data-bs-target="#modalSiswa"><i class="bi bi-plus-circle"></i> add siswa</button>
-                  <SiswaModalAdd @siswaAdd="refreshData"> </SiswaModalAdd>
+                  <button type="button" @click="getListKelas()" class="btn btn-info btn-sm shadow AddSiswa" data-bs-toggle="modal" data-bs-target="#modalSiswa"><i class="bi bi-plus-circle"></i> add siswa</button>
+                  <SiswaModalAdd @siswaAdd="refreshData" :dataListKelas="ListKelas" :dataLoadedKelas="FetchAddDataKelas"> </SiswaModalAdd>
                 </div>
               </div>
               <!-- table -->
@@ -93,12 +93,12 @@
                         </td>
                         <td nowrap=""  style="text-align: center;">{{ item.gender }} <hr> {{ item.birth_date }}</td>
                         <td nowrap="">{{ item.phone_number }}</td>
-                        <td nowrap="">
-                          <span v-if="item.status == 'Active'" style="width: 60px;" class="badge rounded-pill text-bg-success">
-                            {{ item.status }}
+                        <td nowrap="" style="text-align: center;">
+                          <span v-if="item.status == 'Active'" style="width: 30px;" class="badge rounded-pill text-bg-success">
+                            <!-- {{ item.status }} -->A
                           </span>
-                          <span v-else class="badge rounded-pill text-bg-danger" style="width: 60px">
-                            {{ item.status }}
+                          <span v-else class="badge rounded-pill text-bg-danger" style="width: 30px">
+                            <!-- {{ item.status }} -->N
                           </span>
                         </td>
                         <td nowrap="" style="text-align: center;">
@@ -106,7 +106,7 @@
                               <i class="bi bi-pencil"></i>
                             </button>
 
-                            <button @click="DeleteBaseKelas(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteBaseKelasBtn" >
+                            <button @click="DeleteSiswa(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteSiswaBtn" >
                               <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -223,6 +223,10 @@ export default {
 
       expandedIds: [], //address expand
       expandedName: [], //address expand
+      
+      ListKelas : {},
+      FetchAddDataKelas : false,
+      DeleteSiswaBtn : false,
     }
   },
   mounted() {
@@ -346,6 +350,23 @@ export default {
       }
     },
 
+    async getListKelas() { //get list base mata pelajaran
+        try {
+          this.FetchAddDataKelas = false
+            const response = await axios.get(`${this.baseUrl}/api/get_base_kelas?page=&per_page=&search=`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.token}`,
+                },
+            });
+            this.ListKelas = response.data.data.data
+            this.FetchAddDataKelas = true
+            return response
+        } catch (error) {
+          console.log(error.response.data.message)
+        }
+      },
+
     // ------------------update section---------------------
     async openUpdateSemester(id){
       this.OpenUpdateSemesterBtn = true
@@ -367,6 +388,52 @@ export default {
         this.OpenUpdateSemesterBtn = false
       }
     },
+
+    DeleteSiswa(id){
+      this.$swal({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        showLoaderOnConfirm: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        preConfirm: async () => {
+          try {
+              this.DeleteSiswaBtn = true
+              const response = await axios.delete(`${this.baseUrl}/api/del_siswa/${id}`,  {
+                headers: {
+                  'Authorization': `Bearer ${this.token}`,
+                },
+              });
+              
+              this.DeleteSiswaBtn = false
+              return response
+
+            } catch (error) {
+              if (error.response && error.response.status == 400) {
+                this.$swal.showValidationMessage(`
+                  Request failed: ${error.response.data.message}
+                `);
+              }
+              console.error(error,"check error");
+            }
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$swal.fire({
+            title: "Success!",
+            text: "Success Delete Data",
+            icon: "success",
+          }).then(() => {
+            this.refreshData()
+          })
+        }
+      });
+    },
+    
     Toasttt(msg, type, detail){
       const Toast = this.$swal.mixin({
           toast: true,
