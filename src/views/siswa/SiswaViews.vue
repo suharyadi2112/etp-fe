@@ -47,7 +47,7 @@
                   </div>
                 </div>
                 <div class="table-responsive">
-                  <table class="table table-hover table-bordered shadow-sm caption-top">
+                  <table class="table table-hover table-bordered shadow-sm caption-top table-sm">
                     <caption class="pb-2 pt-0">List of siswa</caption>
                     <thead class="table-primary">
                       <tr style="vertical-align:middle; text-align: center;">
@@ -56,7 +56,6 @@
                         <th scope="col">Nama</th>
                         <th scope="col">Kelas</th>
                         <th scope="col">JK - TL</th>
-                        <th scope="col">No Telp</th>
                         <th scope="col">Status</th>
                         <th scope="col">Action</th>
                       </tr>
@@ -81,9 +80,8 @@
                             {{ item.nama }}
                           </span>
                         </td>
-                        <td nowrap="">{{ item.basekelas.nama_kelas }}</td>
-                        <td nowrap=""  style="text-align: center;">{{ item.gender }} <hr> {{ item.birth_date }}</td>
-                        <td nowrap="">{{ item.phone_number }}</td>
+                        <td nowrap="" style="text-align: center;">{{ item.basekelas.nama_kelas }}</td>
+                        <td nowrap="" style="text-align: center;">{{ item.gender }} <hr> {{ item.birth_date }}</td>
                         <td nowrap="" style="text-align: center;">
                           <span v-if="item.status == 'Active'" style="width: 30px;" class="badge rounded-pill text-bg-success">
                             <!-- {{ item.status }} -->A
@@ -92,7 +90,7 @@
                             <!-- {{ item.status }} -->N
                           </span>
                         </td>
-                        <td nowrap="" style="text-align: center;">
+                        <td nowrap="" width="40px;" style="text-align: center;">
                             
                             <router-link :to="'/detail-siswa/' + item.id">
                               <button class="btn btn-info btn-sm m-1 shadow" title="Detail">
