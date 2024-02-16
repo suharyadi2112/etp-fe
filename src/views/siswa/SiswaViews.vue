@@ -47,7 +47,7 @@
                   </div>
                 </div>
                 <div class="table-responsive">
-                  <table class="table table-hover table-bordered shadow-sm caption-top">
+                  <table class="table table-hover table-bordered shadow-sm caption-top table-sm">
                     <caption class="pb-2 pt-0">List of siswa</caption>
                     <thead class="table-primary">
                       <tr style="vertical-align:middle; text-align: center;">
@@ -55,9 +55,7 @@
                         <th scope="col">Nis</th>
                         <th scope="col">Nama</th>
                         <th scope="col">Kelas</th>
-                        <th scope="col">Alamat</th>
                         <th scope="col">JK - TL</th>
-                        <th scope="col">No Telp</th>
                         <th scope="col">Status</th>
                         <th scope="col">Action</th>
                       </tr>
@@ -74,7 +72,7 @@
                       <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
                         <th scope="row" style="text-align: center;">{{ item.number }}</th>
                         <td nowrap="">{{ item.nis }}</td>
-                        <td style="text-align: left; width:50%;" @click="toggleExpandName(item.id)">
+                        <td style="text-align: left; width:20%;" @click="toggleExpandName(item.id)">
                           <span v-if="!expandedName.includes(item.id)">
                             {{ shortenName(item.nama) }}
                           </span>
@@ -82,17 +80,8 @@
                             {{ item.nama }}
                           </span>
                         </td>
-                        <td nowrap="">{{ item.basekelas.nama_kelas }}</td>
-                        <td style="text-align: justify; width:50%;" @click="toggleExpand(item.id)">
-                          <span  v-if="!expandedIds.includes(item.id)">
-                            {{ shortenAddress(item.address) }}
-                          </span>
-                          <span v-else>
-                            {{ item.address }}
-                          </span>
-                        </td>
-                        <td nowrap=""  style="text-align: center;">{{ item.gender }} <hr> {{ item.birth_date }}</td>
-                        <td nowrap="">{{ item.phone_number }}</td>
+                        <td nowrap="" style="text-align: center;">{{ item.basekelas.nama_kelas }}</td>
+                        <td nowrap="" style="text-align: center;">{{ item.gender }} <hr> {{ item.birth_date }}</td>
                         <td nowrap="" style="text-align: center;">
                           <span v-if="item.status == 'Active'" style="width: 30px;" class="badge rounded-pill text-bg-success">
                             <!-- {{ item.status }} -->A
@@ -101,12 +90,19 @@
                             <!-- {{ item.status }} -->N
                           </span>
                         </td>
-                        <td nowrap="" style="text-align: center;">
-                            <button @click="openUpdateSemester(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateSemester" :disabled="OpenUpdateSemesterBtn" >
+                        <td nowrap="" width="40px;" style="text-align: center;">
+                            
+                            <router-link :to="'/detail-siswa/' + item.id">
+                              <button class="btn btn-info btn-sm m-1 shadow" title="Detail">
+                                <i class="bi bi-eye text-white"></i>
+                              </button>
+                            </router-link>
+                            
+                            <button @click="openUpdateSiswa(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateSiswa" :disabled="OpenUpdateSiswaBtn" title="Update">
                               <i class="bi bi-pencil"></i>
                             </button>
 
-                            <button @click="DeleteSiswa(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteSiswaBtn" >
+                            <button @click="DeleteSiswa(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteSiswaBtn" title="Delete">
                               <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -117,7 +113,7 @@
                     </tbody>
                   </table>
                 </div>
-                <SemesterModalUpdate @semesterUpdate="refreshData" :dataLoaded="FetchUpdateData" :dataFormUpdate="FormDataUpdate"> </SemesterModalUpdate>
+                <SiswaModalUp @siswaUpdate="refreshData" :dataLoadedSiswa="FetchUpdateData" :dataFormUpdateSiswa="FormDataUpdate" :getKelas="GetKelas"> </SiswaModalUp>
                 <!-- table -->
                 <div class="row">
                   <div class="col-9">
@@ -192,13 +188,13 @@
 
 <script>
 import SiswaModalAdd from '@/components/siswa_component/SiswaModalAdd.vue';
-import SemesterModalUpdate from '@/components/semester_component/SemesterModalUpdate.vue';
+import SiswaModalUp from '@/components/siswa_component/SiswaModalUp.vue';
 import axios from 'axios';
 
 export default {
   components:{
     SiswaModalAdd,
-    SemesterModalUpdate,
+    SiswaModalUp,
   },
   data() {
     return {
@@ -216,12 +212,12 @@ export default {
       endEntryData: 0,
       totalItemsData : 0, 
 
-      OpenUpdateSemesterBtn : false,
+      OpenUpdateSiswaBtn : false,
       FetchUpdateData : false,
 
       FormDataUpdate : {}, //data for update
+      GetKelas : {}, //data for kelas list
 
-      expandedIds: [], //address expand
       expandedName: [], //address expand
       
       ListKelas : {},
@@ -320,26 +316,11 @@ export default {
     refreshData(){
       this.fetchData();
     },
-
-    shortenAddress(address) {
-      if (address.length > 40) {
-        return address.substring(0, 40) + ' ... '; // Potong alamat jika lebih dari 40 karakter
-      } else {
-        return address;
-      }
-    },
     shortenName(name) {
       if (name.length > 20) {
         return name.substring(0, 20) + ' ... '; 
       } else {
         return name;
-      }
-    },
-    toggleExpand(itemId) {
-      if (this.expandedIds.includes(itemId)) {
-        this.expandedIds = this.expandedIds.filter(id => id !== itemId);
-      } else {
-        this.expandedIds.push(itemId);
       }
     },
     toggleExpandName(itemId) {
@@ -349,7 +330,6 @@ export default {
         this.expandedName.push(itemId);
       }
     },
-
     async getListKelas() { //get list base mata pelajaran
         try {
           this.FetchAddDataKelas = false
@@ -368,24 +348,44 @@ export default {
       },
 
     // ------------------update section---------------------
-    async openUpdateSemester(id){
-      this.OpenUpdateSemesterBtn = true
+    async openUpdateSiswa(id){
+      this.OpenUpdateSiswaBtn = true
       this.FetchUpdateData = false
       try {
-          const response = await axios.get(`${this.baseUrl}/api/get_semester/${id}`,{
+          const response = await axios.get(`${this.baseUrl}/api/get_siswa/${id}`,{
               headers: {
                   'Authorization': `Bearer ${this.token}`,
               },
           });
-          
-          this.FetchUpdateData = true //send info to child component update
           this.FormDataUpdate = response.data //send data to child component
+          //gunakan await agar tdk asycn
+          await this.getKelas().then((getKelas) => {
+            if (getKelas.status == 200) {
+                this.FetchUpdateData = true //send info to child component update
+            }
+          });
+
           return response
           
       } catch (error) {
         this.Toasttt("Server Error", "error", "")
       } finally { 
-        this.OpenUpdateSemesterBtn = false
+        this.OpenUpdateSiswaBtn = false
+      }
+    },
+
+    async getKelas() { //get list kelas
+      try {
+          const response = await axios.get(`${this.baseUrl}/api/get_base_kelas?page=&per_page=&search=`, {
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${this.token}`,
+              },
+          });
+          this.GetKelas = response.data.data.data
+          return response
+      } catch (error) {
+        console.log(error.response.data.message)
       }
     },
 
