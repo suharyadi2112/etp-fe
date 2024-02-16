@@ -132,21 +132,6 @@
 </main>
 </template>
 
-<style scoped>
-.image-container {
-  width: 200px; /* Atur lebar gambar */
-  height: 200px; /* Atur tinggi gambar */
-  overflow: hidden; /* Masking gambar yang melebihi kontainer */
-}
-
-.image-container img {
-  width: 100%; /* Atur lebar gambar agar memenuhi kontainer */
-  height: auto; /* Lebar gambar disesuaikan dengan aspek rasio aslinya */
-  display: block; /* Agar gambar muncul di tengah-tengah kontainer */
-  margin: 0 auto; /* Agar gambar muncul di tengah-tengah kontainer */
-}
-</style>
-
 <script>
 import axios from 'axios';
 import 'primevue/resources/themes/bootstrap4-light-blue/theme.css'
