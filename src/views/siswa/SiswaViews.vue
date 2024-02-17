@@ -358,6 +358,8 @@ export default {
               },
           });
           this.FormDataUpdate = response.data //send data to child component
+
+          console.log(this.FormDataUpdate)
           //gunakan await agar tdk asycn
           await this.getKelas().then((getKelas) => {
             if (getKelas.status == 200) {
