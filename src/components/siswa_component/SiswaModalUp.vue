@@ -141,6 +141,88 @@
                 </div>
               </div>
 
+              <div class="col-md-4">
+                <div class="input-group has-validation">
+                  <div class="form-floating is-invalid">
+                      <select :class="{ 'form-select': true, 'is-invalid': error.religion }" v-model="formData.data.religion" id="religion_name" aria-label="Floating label" name="religion">
+                          <option value="" selected>Choose...</option>
+                          <option value="Islam" >Islam</option>
+                          <option value="Kristen" >Kristen</option>
+                          <option value="Hindu" >Hindu</option>
+                          <option value="Buddha" >Buddha</option>
+                          <option value="Konghucu" >Konghucu</option>
+                      </select>
+                      
+                      <label for="religion_name">Agama</label>
+                  </div>
+                  <div v-if="error.religion" class="invalid-feedback">
+                    Agama harus diisi.
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="input-group has-validation">
+                  <div class="form-floating is-invalid">
+                    <form class="form-floating">
+                        <input type="text" :class="{ 'form-control': true,'is-invalid': error.email }"  id="email" placeholder="tes@gmail.com" v-model="formData.data.email" name="email">
+                        <label for="email">Email</label>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="input-group has-validation">
+                  <div class="form-floating is-invalid">
+                    <form class="form-floating">
+                        <input type="number" :class="{ 'form-control': true,'is-invalid': error.parent_phone_number }"  id="parent_phone_number" placeholder="082283778895" v-model="formData.data.parent_phone_number" name="parent_phone_number">
+                        <label for="parent_phone_number">Nomor Telp Orang Tua</label>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                  <label for="formFile" class="form-label"><b>Photo Profile</b><code> .jpg, .jpeg, .png</code></label>
+                  <input accept="image/jpeg, image/jpg, image/png" @change="handleFileChangeUP" :class="{'form-control': true,'is-invalid': error.photo_profile }"  type="file" id="formFile">
+              </div>
+              
+              <div>
+                <img :src="formData.data.photo_profile" alt="Uploaded Image" style="width:30%">
+              </div>
+
+              <div class="col-md-12 mb-0">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary text-white"><i class="bi bi-facebook"></i></span>
+                  <div class="form-floating">
+                    <input type="text" :class="{ 'form-control': true,'is-invalid': error.facebook }" id="facebook" placeholder="https://www.facebook.com/example_page" name="facebook"  v-model="formData.data.facebook">
+                      <label for="facebook">https://www.facebook.com/example_page</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12 mb-0 mt-0">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary text-white"><i class="bi bi-instagram"></i></span>
+                  <div class="form-floating">
+                    <input type="text" :class="{ 'form-control': true,'is-invalid': error.instagram }" id="instagram" placeholder="https://www.instagram.com/example_account" name="instagram" v-model="formData.data.instagram">
+                      <label for="instagram">https://www.instagram.com/example_account</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12 mb-0 mt-0">
+                <div class="input-group mb-3">
+                  <span class="input-group-text bg-primary text-white"><i class="bi bi-linkedin"></i></span>
+                  <div class="form-floating">
+                    <input type="text" :class="{ 'form-control': true,'is-invalid': error.linkedin }" id="linkedin" placeholder="https://www.linkedin.com/in/example_profile" name="linkedin" v-model="formData.data.linkedin">
+                      <label for="linkedin">https://www.linkedin.com/in/example_profile</label>
+                  </div>
+                </div>
+              </div>
+
+
 
             </div>
             <div class="modal-footer">
@@ -199,11 +281,21 @@
       }
     },
     methods: {
+      handleFileChangeUP(event) { //preview photo dan convert base 64
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            this.formData.data.photo_profile = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      },
       submitFormSiswa() {
         this.loadingSubmitSiswa = true //progres btn
         this.error = {};
         //validation
-        const requiredFields = ['nis', 'nama','gender','birth_date','birth_place','address','phone_number','id_kelas'];
+        const requiredFields = ['nis', 'nama','gender','birth_date','birth_place','address','phone_number','id_kelas','religion'];
         requiredFields.forEach(field => { 
           
           console.log(this.formData.data[field])
