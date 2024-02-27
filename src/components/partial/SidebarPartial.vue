@@ -48,6 +48,11 @@
             <i class="bi bi-circle"></i><span>Siswa</span>
             </router-link>
         </li>
+        <li>
+            <router-link to="/guru" class="nav-link collapsed">
+            <i class="bi bi-circle"></i><span>Guru</span>
+            </router-link>
+        </li>
         
         </ul>
     </li>

@@ -9,18 +9,18 @@
               <div class="row">
                 <div class="col-sm-10">
                   <div class="pagetitle"> 
-                    <h1 class="text-left">Siswa</h1>
+                    <h1 class="text-left">Guru</h1>
                     <nav>
                       <ol class="breadcrumb breadJa">
                         <router-link :to="{ name: '/'}" class="breadcrumb-item">Home</router-link>
-                        <router-link :to="{ name: 'siswadashboard'}" class="breadcrumb-item">Siswa</router-link>
+                        <router-link :to="{ name: 'gurudashboard'}" class="breadcrumb-item">Guru</router-link>
                       </ol>
                     </nav>
                   </div>
                 </div> 
                 <div class="col-2">
-                  <button type="button" @click="getListKelas()" class="btn btn-info btn-sm shadow AddSiswa" data-bs-toggle="modal" data-bs-target="#modalSiswa"><i class="bi bi-plus-circle"></i> add siswa</button>
-                  <SiswaModalAdd @siswaAdd="refreshData" :dataListKelas="ListKelas" :dataLoadedKelas="FetchAddDataKelas"> </SiswaModalAdd>
+                  <button type="button" @click="fetchDataAdd()" class="btn btn-info btn-sm shadow AddGuru" data-bs-toggle="modal" data-bs-target="#modalGuru"><i class="bi bi-plus-circle"></i> add guru</button>
+                  <GuruModalAdd @guruAdd="refreshData" :dataLoaded="dataLoaded"> </GuruModalAdd>
                 </div>
               </div>
               <!-- table -->
@@ -48,13 +48,13 @@
                 </div>
                 <div class="table-responsive">
                   <table class="table table-hover table-bordered shadow-sm caption-top table-sm">
-                    <caption class="pb-2 pt-0">List of siswa</caption>
+                    <caption class="pb-2 pt-0">List of guru</caption>
                     <thead class="table-primary">
                       <tr style="vertical-align:middle; text-align: center;">
                         <th scope="col" style="text-align: center;">#</th>
-                        <th scope="col">Nis</th>
+                        <th scope="col">NIP</th>
+                        <th scope="col">NUPTK</th>
                         <th scope="col">Nama</th>
-                        <th scope="col">Kelas</th>
                         <th scope="col">JK - TL</th>
                         <th scope="col">Status</th>
                         <th scope="col">Action</th>
@@ -71,7 +71,8 @@
                       </tr>
                       <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
                         <th scope="row" style="text-align: center;">{{ item.number }}</th>
-                        <td nowrap="">{{ item.nis }}</td>
+                        <td nowrap="" text="center">{{ item.nip }}</td>
+                        <td nowrap="">{{ item.nuptk }}</td>
                         <td style="text-align: left; width:20%;" @click="toggleExpandName(item.id)">
                           <span v-if="!expandedName.includes(item.id)">
                             {{ shortenName(item.nama) }}
@@ -80,7 +81,6 @@
                             {{ item.nama }}
                           </span>
                         </td>
-                        <td nowrap="" style="text-align: center;">{{ item.basekelas.nama_kelas }}</td>
                         <td nowrap="" style="text-align: center;">{{ item.gender }} <hr> {{ item.birth_date }}</td>
                         <td nowrap="" style="text-align: center;">
                           <span v-if="item.status == 'Active'" style="width: 30px;" class="badge rounded-pill text-bg-success">
@@ -92,13 +92,13 @@
                         </td>
                         <td nowrap="" width="40px;" style="text-align: center;">
                             
-                            <router-link :to="'/detail-siswa/' + item.id">
+                            <router-link :to="'/detail-guru/' + item.id">
                               <button class="btn btn-info btn-sm m-1 shadow" title="Detail">
                                 <i class="bi bi-eye text-white"></i>
                               </button>
                             </router-link>
                             
-                            <button @click="openUpdateSiswa(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateSiswa" :disabled="OpenUpdateSiswaBtn" title="Update">
+                            <button @click="openUpdateGuru(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#modalGuruUpdate" :disabled="OpenUpdateGuruBtn" title="Update">
                               <i class="bi bi-pencil"></i>
                             </button>
 
@@ -113,7 +113,7 @@
                     </tbody>
                   </table>
                 </div>
-                <SiswaModalUp @siswaUpdate="refreshData" :dataLoadedSiswa="FetchUpdateData" :dataFormUpdateSiswa="FormDataUpdate" :getKelas="GetKelas"> </SiswaModalUp>
+                <GuruModalUp @guruUpdate="refreshData" :fileTemp="fileTemp" :dataLoadedGuru="FetchUpdateData" :dataFormUpdateGuru="FormDataUpdate"> </GuruModalUp>
                 <!-- table -->
                 <div class="row">
                   <div class="col-9">
@@ -158,10 +158,10 @@
   }
   /* ponsel */
   @media screen and (max-width: 767px) { 
-    .AddSiswa {
+    .AddGuru {
       font-size: 0; 
     }
-    .AddSiswa i {
+    .AddGuru i {
       font-size: 1rem; 
     }
     .searchBoxText i {
@@ -176,7 +176,7 @@
   }
   /* dekstop */
   @media screen and (min-width: 768px) {
-    .AddSiswa{
+    .AddGuru{
       float: right;
     }
     .searchBox{
@@ -187,14 +187,14 @@
 </style>
 
 <script>
-import SiswaModalAdd from '@/components/siswa_component/SiswaModalAdd.vue';
-import SiswaModalUp from '@/components/siswa_component/SiswaModalUp.vue';
+import GuruModalAdd from '@/components/guru_component/GuruModalAdd.vue';
+import GuruModalUp from '@/components/guru_component/GuruModalUp.vue';
 import axios from 'axios';
 
 export default {
   components:{
-    SiswaModalAdd,
-    SiswaModalUp,
+    GuruModalAdd,
+    GuruModalUp,
   },
   data() {
     return {
@@ -207,12 +207,13 @@ export default {
       baseUrl: process.env.BE_APP_BASE_URL,
       token: localStorage.getItem('tokenETP'),
       loading: false,
+      dataLoaded: false,
 
       startEntryData : 0,
       endEntryData: 0,
       totalItemsData : 0, 
 
-      OpenUpdateSiswaBtn : false,
+      OpenUpdateGuruBtn : false,
       FetchUpdateData : false,
 
       FormDataUpdate : {}, //data for update
@@ -220,9 +221,10 @@ export default {
 
       expandedName: [], //address expand
       
-      ListKelas : {},
       FetchAddDataKelas : false,
       DeleteSiswaBtn : false,
+
+      fileTemp: null,
     }
   },
   mounted() {
@@ -244,7 +246,7 @@ export default {
       try {
         this.loading = true; //loading fetch
         // await new Promise(resolve => setTimeout(resolve, 1000));
-        const response = await axios(`${this.baseUrl}/api/get_siswa/`, {
+        const response = await axios(`${this.baseUrl}/api/get_guru/`, {
           headers: {
             Authorization: `Bearer ${this.token}`
           },
@@ -330,67 +332,50 @@ export default {
         this.expandedName.push(itemId);
       }
     },
-    async getListKelas() { //get list kelas
-        try {
-          this.FetchAddDataKelas = false
-            const response = await axios.get(`${this.baseUrl}/api/get_base_kelas?page=&per_page=&search=`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.token}`,
-                },
-            });
-            this.ListKelas = response.data.data.data
-            this.FetchAddDataKelas = true
-            return response
-        } catch (error) {
-          console.log(error.response.data.message)
-        }
-      },
+
+    async fetchDataAdd(){
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        this.dataLoaded = true
+    },
 
     // ------------------update section---------------------
-    async openUpdateSiswa(id){
-      this.OpenUpdateSiswaBtn = true
+    async openUpdateGuru(id){
+      this.OpenUpdateGuruBtn = true
       this.FetchUpdateData = false
       try {
-          const response = await axios.get(`${this.baseUrl}/api/get_siswa/${id}`,{
+          const response = await axios.get(`${this.baseUrl}/api/get_guru/${id}`,{
               headers: {
                   'Authorization': `Bearer ${this.token}`,
               },
           });
+
+          const pathCloud = response.data.data.path_photo_cloud
+          const pathOri = response.data.data.photo_name_ori
+
+          try {
+              const path = { realpath: pathCloud } //path cloud photo
+              const responseTempFile = await axios.post(`${this.baseUrl}/api/temp_file`, path, {
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${this.token}`,
+                  },
+              });
+              this.fileTemp = responseTempFile.data.data;
+          } catch (error) {
+              console.log(error)
+              this.fileTemp = `${this.baseUrl}/storage${pathOri}` //get local file jika fail
+          }
+
           this.FormDataUpdate = response.data //send data to child component
-
-          console.log(this.FormDataUpdate)
-          //gunakan await agar tdk asycn
-          await this.getKelas().then((getKelas) => {
-            if (getKelas.status == 200) {
-                this.FetchUpdateData = true //send info to child component update
-            }
-          });
-
-          return response
+          this.FetchUpdateData = true
           
       } catch (error) {
         this.Toasttt("Server Error", "error", "")
       } finally { 
-        this.OpenUpdateSiswaBtn = false
+        this.OpenUpdateGuruBtn = false
       }
     },
-
-    async getKelas() { //get list kelas
-      try {
-          const response = await axios.get(`${this.baseUrl}/api/get_base_kelas?page=&per_page=&search=`, {
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${this.token}`,
-              },
-          });
-          this.GetKelas = response.data.data.data
-          return response
-      } catch (error) {
-        console.log(error.response.data.message)
-      }
-    },
-
+  
     DeleteSiswa(id){
       this.$swal({
         title: "Are you sure?",

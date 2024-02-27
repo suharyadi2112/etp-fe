@@ -4,18 +4,18 @@
       <div class="row">
         <div class="col-sm-10">
             <div class="pagetitle"> 
-            <h1 class="text-left">Detail Siswa</h1>
+            <h1 class="text-left">Detail Guru</h1>
                 <nav>
                     <ol class="breadcrumb breadJa">
                     <router-link :to="{ name: '/'}" class="breadcrumb-item">Home</router-link>
-                    <router-link :to="{ name: 'siswadashboard'}" class="breadcrumb-item">Siswa</router-link>
-                    <router-link :to="{ name: 'siswadetail'}" class="breadcrumb-item">Detail</router-link>
+                    <router-link :to="{ name: 'gurudashboard'}" class="breadcrumb-item">Guru</router-link>
+                    <router-link :to="{ name: 'gurudetail'}" class="breadcrumb-item">Detail</router-link>
                     </ol>
                 </nav>
             </div>
         </div> 
         <div class="col-sm-2 text-end">
-            <router-link to="/siswa">
+            <router-link to="/guru">
                 <button  class="btn btn-warning btn-sm m-1 shadow" title="Back">
                     <i class="bi bi-arrow-left"></i> 
                 </button>
@@ -35,7 +35,7 @@
                 <img :src="this.fileTemp" alt="Profile" class="rounded-circle">
                 <h2 style="text-align: center;">{{ items.nama }} </h2>
                 <br>
-                <h3>NIS : {{ items.nis }}</h3>
+                <h3>NIP : {{ items.nip }}</h3>
                 <div class="social-links mt-2">
                     <a :href="items.facebook" class="facebook" target="_blank"><i class="bi bi-facebook"></i></a>
                     <a :href="items.instagram" class="instagram" target="_blank"><i class="bi bi-instagram"></i></a>
@@ -69,6 +69,11 @@
                     <h5 class="card-title">Profile Details</h5>
 
                     <div class="row">
+                        <div class="col-lg-3 col-md-4 label">NUPTK</div>
+                        <div class="col-lg-9 col-md-8">{{ items.nuptk ? items.nuptk : '-' }}</div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-lg-3 col-md-4 label">Jenis Kelamin</div>
                         <div class="col-lg-9 col-md-8">{{ items.gender ? items.gender : '-' }}</div>
                     </div>
@@ -98,11 +103,6 @@
                         <div class="col-lg-9 col-md-8">{{ items.status ? items.status : '-' }}</div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-lg-3 col-md-4 label">Kelas</div>
-                        <div class="col-lg-9 col-md-8">{{ items.basekelas && items.basekelas.nama_kelas }}</div>
-                    </div>
-                    
                     <div class="row">
                         <div class="col-lg-3 col-md-4 label">Agama</div>
                         <div class="col-lg-9 col-md-8">{{ items.religion ? items.religion : '-' }}</div>
@@ -148,12 +148,12 @@ export default {
             baseUrl: process.env.BE_APP_BASE_URL,
             baseUrlDropBox: process.env.BASE_URL_DROPBOX,
             token: localStorage.getItem('tokenETP'),
-            idSiswa : null,
+            idGuru : null,
             ProfileOne : false,
         }
     },
     mounted() {
-        this.idSiswa = this.$route.params.id;
+        this.idGuru = this.$route.params.id;
         this.fetchData();
     },
     methods: {
@@ -162,7 +162,7 @@ export default {
                 this.ProfileOne = false;
                 this.loading = true; 
                 // await new Promise(resolve => setTimeout(resolve, 1000));
-                const response = await axios(`${this.baseUrl}/api/get_siswa/${this.idSiswa}`, {
+                const response = await axios(`${this.baseUrl}/api/get_guru/${this.idGuru}`, {
                     headers: {
                         Authorization: `Bearer ${this.token}`
                     },
@@ -194,7 +194,7 @@ export default {
                 this.fileTemp = responseTempFile.data.data;
             } catch (error) {
                 console.log(error.response)
-                this.fileTemp = `${this.baseUrl}/storage/${this.items.photo_name_ori}` //get local file jika fail
+                this.fileTemp = `${this.baseUrl}/storage${this.items.photo_name_ori}` //get local file jika fail
             }
         
         },
