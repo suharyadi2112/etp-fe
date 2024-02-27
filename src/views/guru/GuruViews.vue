@@ -98,7 +98,7 @@
                               </button>
                             </router-link>
                             
-                            <button @click="openUpdateSiswa(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#updateSiswa" :disabled="OpenUpdateSiswaBtn" title="Update">
+                            <button @click="openUpdateGuru(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#modalGuruUpdate" :disabled="OpenUpdateGuruBtn" title="Update">
                               <i class="bi bi-pencil"></i>
                             </button>
 
@@ -113,7 +113,7 @@
                     </tbody>
                   </table>
                 </div>
-                <SiswaModalUp @siswaUpdate="refreshData" :dataLoadedSiswa="FetchUpdateData" :dataFormUpdateSiswa="FormDataUpdate" :getKelas="GetKelas"> </SiswaModalUp>
+                <GuruModalUp @guruUpdate="refreshData" :fileTemp="fileTemp" :dataLoadedGuru="FetchUpdateData" :dataFormUpdateGuru="FormDataUpdate"> </GuruModalUp>
                 <!-- table -->
                 <div class="row">
                   <div class="col-9">
@@ -188,13 +188,13 @@
 
 <script>
 import GuruModalAdd from '@/components/guru_component/GuruModalAdd.vue';
-import SiswaModalUp from '@/components/siswa_component/SiswaModalUp.vue';
+import GuruModalUp from '@/components/guru_component/GuruModalUp.vue';
 import axios from 'axios';
 
 export default {
   components:{
     GuruModalAdd,
-    SiswaModalUp,
+    GuruModalUp,
   },
   data() {
     return {
@@ -213,7 +213,7 @@ export default {
       endEntryData: 0,
       totalItemsData : 0, 
 
-      OpenUpdateSiswaBtn : false,
+      OpenUpdateGuruBtn : false,
       FetchUpdateData : false,
 
       FormDataUpdate : {}, //data for update
@@ -223,6 +223,8 @@ export default {
       
       FetchAddDataKelas : false,
       DeleteSiswaBtn : false,
+
+      fileTemp: null,
     }
   },
   mounted() {
@@ -337,27 +339,43 @@ export default {
     },
 
     // ------------------update section---------------------
-    async openUpdateSiswa(id){
-      this.OpenUpdateSiswaBtn = true
+    async openUpdateGuru(id){
+      this.OpenUpdateGuruBtn = true
       this.FetchUpdateData = false
       try {
-          const response = await axios.get(`${this.baseUrl}/api/get_siswa/${id}`,{
+          const response = await axios.get(`${this.baseUrl}/api/get_guru/${id}`,{
               headers: {
                   'Authorization': `Bearer ${this.token}`,
               },
           });
-          this.FormDataUpdate = response.data //send data to child component
 
-          console.log(this.FormDataUpdate)
-          return response
+          const pathCloud = response.data.data.path_photo_cloud
+          const pathOri = response.data.data.photo_name_ori
+
+          try {
+              const path = { realpath: pathCloud } //path cloud photo
+              const responseTempFile = await axios.post(`${this.baseUrl}/api/temp_file`, path, {
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${this.token}`,
+                  },
+              });
+              this.fileTemp = responseTempFile.data.data;
+          } catch (error) {
+              console.log(error)
+              this.fileTemp = `${this.baseUrl}/storage${pathOri}` //get local file jika fail
+          }
+
+          this.FormDataUpdate = response.data //send data to child component
+          this.FetchUpdateData = true
           
       } catch (error) {
         this.Toasttt("Server Error", "error", "")
       } finally { 
-        this.OpenUpdateSiswaBtn = false
+        this.OpenUpdateGuruBtn = false
       }
     },
-
+  
     DeleteSiswa(id){
       this.$swal({
         title: "Are you sure?",
