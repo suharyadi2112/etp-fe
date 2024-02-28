@@ -113,7 +113,7 @@
                     </tbody>
                   </table>
                 </div>
-                <SiswaModalUp @siswaUpdate="refreshData" :dataLoadedSiswa="FetchUpdateData" :dataFormUpdateSiswa="FormDataUpdate" :getKelas="GetKelas"> </SiswaModalUp>
+                <SiswaModalUp @siswaUpdate="refreshData" :fileTemp="fileTemp" :dataLoadedSiswa="FetchUpdateData" :dataFormUpdateSiswa="FormDataUpdate" :getKelas="GetKelas"> </SiswaModalUp>
                 <!-- table -->
                 <div class="row">
                   <div class="col-9">
@@ -223,6 +223,8 @@ export default {
       ListKelas : {},
       FetchAddDataKelas : false,
       DeleteSiswaBtn : false,
+
+      fileTemp: null,
     }
   },
   mounted() {
@@ -360,6 +362,25 @@ export default {
           this.FormDataUpdate = response.data //send data to child component
 
           console.log(this.FormDataUpdate)
+
+          const pathCloud = response.data.data.path_photo_cloud
+          const pathOri = response.data.data.photo_name_ori
+
+          try {
+              const path = { realpath: pathCloud } //path cloud photo
+              const responseTempFile = await axios.post(`${this.baseUrl}/api/temp_file`, path, {
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${this.token}`,
+                  },
+              });
+              this.fileTemp = responseTempFile.data.data;
+          } catch (error) {
+              console.log(error)
+              this.fileTemp = `${this.baseUrl}/storage${pathOri}` //get local file jika fail
+          }
+
+
           //gunakan await agar tdk asycn
           await this.getKelas().then((getKelas) => {
             if (getKelas.status == 200) {
