@@ -102,7 +102,7 @@
                               <i class="bi bi-pencil"></i>
                             </button>
 
-                            <button @click="DeleteSiswa(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteSiswaBtn" title="Delete">
+                            <button @click="DeleteGuru(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteGuruBtn" title="Delete">
                               <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -222,7 +222,7 @@ export default {
       expandedName: [], //address expand
       
       FetchAddDataKelas : false,
-      DeleteSiswaBtn : false,
+      DeleteGuruBtn : false,
 
       fileTemp: null,
     }
@@ -376,7 +376,7 @@ export default {
       }
     },
   
-    DeleteSiswa(id){
+    DeleteGuru(id){
       this.$swal({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
@@ -388,14 +388,14 @@ export default {
         confirmButtonText: "Yes, delete it!",
         preConfirm: async () => {
           try {
-              this.DeleteSiswaBtn = true
-              const response = await axios.delete(`${this.baseUrl}/api/del_siswa/${id}`,  {
+              this.DeleteGuruBtn = true
+              const response = await axios.delete(`${this.baseUrl}/api/del_guru/${id}`,  {
                 headers: {
                   'Authorization': `Bearer ${this.token}`,
                 },
               });
               
-              this.DeleteSiswaBtn = false
+              this.DeleteGuruBtn = false
               return response
 
             } catch (error) {

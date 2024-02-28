@@ -188,8 +188,11 @@
                   <input accept="image/jpeg, image/jpg, image/png" @change="handleFileChangeUP" :class="{'form-control': true,'is-invalid': error.photo_profile }"  type="file" id="formFile">
               </div>
               
-              <div>
-                <img :src="formData.data.photo_profile" alt="Uploaded Image" style="width:30%">
+              <div v-if="this.formData.data.photo_profile">
+                <img :src="this.formData.data.photo_profile" alt="Uploaded Image" style="width:30%">
+              </div>
+              <div v-else-if="tempFile">
+                <img :src="tempFile" alt="Uploaded Image" style="width:30%">
               </div>
 
               <div class="col-md-12 mb-0">
@@ -249,7 +252,8 @@
     props: {
       dataLoadedSiswa : Boolean,
       dataFormUpdateSiswa: Object,
-      getKelas : Object
+      getKelas : Object,
+      fileTemp: String,
     },
     computed: {
       hasLoadedSiswa() {
@@ -257,6 +261,9 @@
       },
       listOptionKelas() { //pakai computed/watcher untuk serve data langsung
         return { ...this.getKelas };
+      },
+      tempFile() {
+        return this.fileTemp;
       }
     },
     data() {
