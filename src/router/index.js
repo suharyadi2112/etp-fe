@@ -16,6 +16,8 @@ import SiswaDetail from '../views/siswa/SiswaDetail.vue'
 import GuruDashboard from '../views/guru/GuruViews.vue'
 import GuruDetail from '../views/guru/GuruDetail.vue'
 
+import OrtuDashboard from '../views/orangtua/OrtuViews.vue'
+
 //permission
 import NProgress from 'nprogress';
 
@@ -38,6 +40,8 @@ const routes = [
   //guru
   { path: '/guru', name: 'gurudashboard', components: { default: GuruDashboard }, meta: { requiresAuth: true } },
   { path: '/detail-guru/:id', name: 'gurudetail', components: { default: GuruDetail }, meta: { requiresAuth: true } },
+  //orangtua
+  { path: '/orangtua', name: 'ortudashboard', components: { default: OrtuDashboard }, meta: { requiresAuth: true } },
 
   
 ]
