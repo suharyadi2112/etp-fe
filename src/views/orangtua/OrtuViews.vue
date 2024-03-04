@@ -19,8 +19,8 @@
                   </div>
                 </div> 
                 <div class="col-2">
-                  <button type="button" @click="fetchDataAdd()" class="btn btn-info btn-sm shadow AddOrtu" data-bs-toggle="modal" data-bs-target="#modalOrtu"><i class="bi bi-plus-circle"></i> add orang tua</button>
-                  <OrtuModalAdd @ortuAdd="refreshData" :dataLoadedOrtu="dataLoaded" :dataListSiswa="fetchdataSiswa" > </OrtuModalAdd>
+                  <button type="button" @click="fetchDataAdd('add')" class="btn btn-info btn-sm shadow AddOrtu" data-bs-toggle="modal" data-bs-target="#modalOrtu"><i class="bi bi-plus-circle"></i> add orang tua</button>
+                  <OrtuModalAdd @ortuAdd="refreshData" :dataLoadedOrtu="dataLoaded" :dataListSiswa="fetchdataSiswa" :dataListOrtu="fetchdataListOrtu"> </OrtuModalAdd>
                 </div>
               </div>
               <!-- table -->
@@ -93,7 +93,7 @@
 
                             <button @click="infoDetail(item.email, item.date_of_birth, item.place_of_birth, item.additional_notes)"  class="btn btn-info btn-sm m-1 shadow"><i class="bi bi-eye text-white"></i></button>
 
-                            <button @click="openUpdateGuru(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#modalGuruUpdate" :disabled="OpenUpdateGuruBtn" title="Update">
+                            <button @click="openUpdateOrtu(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#modalOrtuUpdate" :disabled="OpenUpdateOrtuBtn" title="Update">
                               <i class="bi bi-pencil"></i>
                             </button>
 
@@ -109,7 +109,7 @@
                   </table>
                   <!-- Detail Component -->
                 </div>
-                <GuruModalUp @guruUpdate="refreshData" :dataLoadedGuru="FetchUpdateData" :dataFormUpdateGuru="FormDataUpdate"> </GuruModalUp>
+                <OrtuModalUp @ortuUpdate="refreshData" :dataLoadedOrtu="FetchUpdateData" :dataListSiswa="fetchdataSiswa" :dataFormUpdateOrtu="FormDataUpdate"> </OrtuModalUp>
                 <!-- table -->
                 <div class="row">
                   <div class="col-9">
@@ -184,13 +184,13 @@
 
 <script>
 import OrtuModalAdd from '@/components/orangtua_component/OrangtuaModalAdd.vue';
-import GuruModalUp from '@/components/guru_component/GuruModalUp.vue';
+import OrtuModalUp from '@/components/orangtua_component/OrangtuaModalUp.vue';
 import axios from 'axios';
 
 export default {
   components:{
     OrtuModalAdd,
-    GuruModalUp,
+    OrtuModalUp,
   },
   data() {
     return {
@@ -209,7 +209,7 @@ export default {
       endEntryData: 0,
       totalItemsData : 0, 
 
-      OpenUpdateGuruBtn : false,
+      OpenUpdateOrtuBtn : false,
       FetchUpdateData : false,
 
       FormDataUpdate : {}, //data for update
@@ -217,6 +217,7 @@ export default {
       DeleteOrtuBtn : false,
 
       fetchdataSiswa: {},
+      fetchdataListOrtu: {},
     }
   },
   mounted() {
@@ -325,7 +326,8 @@ export default {
       }
     },
 
-    async fetchDataAdd(){
+    async fetchDataAdd(tipe){
+        this.dataLoaded = false
         try {
           const response = await axios.get(`${this.baseUrl}/api/get_list_siswa`,{
               headers: {
@@ -334,10 +336,31 @@ export default {
           });
 
           this.fetchdataSiswa = response.data.data//send data to child component
-          this.dataLoaded = true
-          
+          //gunakan await agar tdk asycn
+          await this.fetchDataListOrtu().then((getListOrtu) => {
+            if (getListOrtu.status == 200) {
+                if(tipe == "add"){ //khusus add
+                  this.dataLoaded = true
+                }
+            }
+          });
+          return response
         } catch (error) {
-          console.log(error)
+          console.log(error, "get list siswa")
+        } 
+    },
+
+    async fetchDataListOrtu(){ //list ortu
+        try {
+          const response = await axios.get(`${this.baseUrl}/api/get_list_ortu`,{
+              headers: {
+                  'Authorization': `Bearer ${this.token}`,
+              },
+          });
+          this.fetchdataListOrtu = response.data.data//send data to child component
+          return response
+        } catch (error) {
+          console.log(error,"get list ortu")
         } 
     },
 
@@ -401,6 +424,36 @@ export default {
           })
         }
       });
+    },
+
+    //update section
+    async openUpdateOrtu(id){
+      this.OpenUpdateOrtuBtn = true
+      this.FetchUpdateData = false
+      try {
+          const response = await axios.get(`${this.baseUrl}/api/get_orangtua/${id}`,{
+              headers: {
+                  'Authorization': `Bearer ${this.token}`,
+              },
+          });
+       
+          this.FormDataUpdate = response.data //send data to child component
+
+          //gunakan await agar tdk asycn
+          await this.fetchDataAdd("up").then((getSiswa) => {
+            if (getSiswa.status == 200) {
+                this.FetchUpdateData = true //send info to child component update
+            }
+          });
+          
+          return response
+          
+      } catch (error) {
+        console.log(error)
+        this.Toasttt("Server Error update", "error", "")
+      } finally { 
+        this.OpenUpdateOrtuBtn = false
+      }
     },
     
     Toasttt(msg, type, detail){

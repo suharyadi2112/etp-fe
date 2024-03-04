@@ -1,10 +1,10 @@
 <!-- ModalFormAddOrangTua -->
 <template>
-    <div class="modal fade" id="modalOrtu" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="modalOrtuUpdate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header bg-primary">
-            <h1 class="modal-title fs-5 text-white" id="staticBackdropLabel">Adding Orang Tua (Wali)</h1>
+          <div class="modal-header bg-info">
+            <h1 class="modal-title fs-5 text-white" id="staticBackdropLabel">Update Orang Tua (Wali)</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
   
@@ -24,50 +24,14 @@
 
               <div class="col-md-6">
                 <div class="input-group has-validation">
-                  <span class="input-group-text">
-                    <div class="form-check form-switch">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        role="switch"
-                        id="flexSwitchCheckChecked"
-                        v-model="isDropdownActive"
-                      >
-                    </div>
-                  </span>
-                  <template v-if="isDropdownActive">
-                
-                    <div class="form-floating is-invalid">
-                      <select :class="{ 'form-select': true, 'is-invalid': error.id }" v-model="formData.id" id="nama_orangtua" aria-label="Floating label" name="nama">
-                          <option value="" selected>Choose...</option>
-                          <option v-for="namaOrtu in listOptionOrtu" :key="namaOrtu.id" :value="namaOrtu.id">
-                            {{ namaOrtu.name }}
-                          </option>
-                      </select>
-                      <label for="nama_orangtua">Orang Tua (Wali)</label>
-                    </div>
-                    <div  class="invalid-feedback">
-                        <span v-if="error.id">Orang Tua harus diisi.</span>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div class="form-floating is-invalid">
-                      <input
-                        type="text"
-                        :class="{ 'form-control': true, 'is-invalid': error.name }"
-                        id="name"
-                        placeholder="Sumail Ahmad"
-                        v-model="formData.name"
-                        name="name"
-                      >
-                      <label for="name">Nama Orang Tua (Wali)</label>
-                    </div>
-                    <div class="invalid-feedback">
-                      <span v-if="error.name">Orang Tua harus diisi.</span>
-                    </div>
-                  </template><div class="small mt-2">
-                    <span v-if="isDropdownActive"><code>*daftar orang tua yang sudah ada (aktif)</code></span>
-                    <span v-else><code>*masukan orang tua baru (nonaktif)</code></span>
+                  <div class="form-floating is-invalid">
+                    <form class="form-floating">
+                        <input type="text" :class="{ 'form-control': true,'is-invalid': error.name }"  id="name" placeholder="Sumail Ahmad" v-model="formData.data.name" name="name">
+                        <label for="name">Nama Orang Tua (Wali)</label>
+                    </form>
+                  </div>
+                  <div v-if="error.name" class="invalid-feedback">
+                    Nama orang tua (wali) harus diisi.
                   </div>
                 </div>
               </div>
@@ -75,14 +39,15 @@
               <div class="col-md-3">
                 <div class="input-group has-validation">
                 
-                    <div class="form-floating is-invalid">
-                      <select :class="{ 'form-select': true, 'is-invalid': error.id_siswa }" v-model="formData.id_siswa" id="nama_siswa" aria-label="Floating label" name="nama">
-                          <option value="" selected>Choose...</option>
-                          <option v-for="namaSiswa in listOptionSiswa" :key="namaSiswa.id" :value="namaSiswa.id">
-                            {{ namaSiswa.nama }}
-                          </option>
-                      </select>
-                      <label for="nama_siswa">Siswa</label>
+                  <div class="form-floating is-invalid">
+                    <select :class="{ 'form-select': true, 'is-invalid': error.id_siswa }" v-model="formData.data.siswa.id" id="nama_siswa" aria-label="Floating label" name="nama">
+                        <option value="" selected>Choose...</option>
+                        <option v-for="namaSiswa in listOptionSiswa" :key="namaSiswa.id" :value="namaSiswa.id">
+                          {{ namaSiswa.nama }}
+                        </option>
+                    </select>
+                    <label for="nama_siswa">Siswa</label>
+                    {{ formData.data.siswa.id }}
                     </div>
                     <div v-if="error.id_siswa" class="invalid-feedback">
                         Siswa harus diisi.
@@ -93,7 +58,7 @@
               <div class="col-md-3">
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
-                      <select :class="{ 'form-select': true, 'is-invalid': error.relationship }" v-model="formData.relationship" id="relationship" aria-label="Floating label" name="relationship">
+                      <select :class="{ 'form-select': true, 'is-invalid': error.relationship }" v-model="formData.data.relationship" id="relationship" aria-label="Floating label" name="relationship">
                           <option value="" selected disable>Choose...</option>
                           <option value="adik">Adik</option>
                           <option value="anggota_komunitas">Anggota Komunitas</option>
@@ -129,7 +94,7 @@
 
               <div class="col-md-6">
                 <div class="form-floating is-invalid">
-                  <textarea :class="{ 'form-control': true, 'is-invalid': error.address }" placeholder="Alamat tempat tinggal....."  v-model="formData.address" id="address" style="height: 100px" name="address"></textarea>
+                  <textarea :class="{ 'form-control': true, 'is-invalid': error.address }" placeholder="Alamat tempat tinggal....."  v-model="formData.data.address" id="address" style="height: 100px" name="address"></textarea>
                   <label for="address">Alamat tempat tinggal orang tua (wali)</label>
                 </div>
                 <div v-if="error.address" class="invalid-feedback">
@@ -141,7 +106,7 @@
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
                     <form class="form-floating">
-                        <input type="text" :class="{ 'form-control': true,'is-invalid': error.email }"  id="email" placeholder="kami@gmail.com" v-model="formData.email" name="email">
+                        <input type="text" :class="{ 'form-control': true,'is-invalid': error.email }"  id="email" placeholder="kami@gmail.com" v-model="formData.data.email" name="email">
                         <label for="email">Email Orang Tua (Wali)</label>
                     </form>
                   </div>
@@ -155,7 +120,7 @@
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
                     <form class="form-floating">
-                        <input type="number" :class="{ 'form-control': true,'is-invalid': error.phone_number }" id="phone_number" placeholder="1232123211" v-model="formData.phone_number" name="phone_number" >
+                        <input type="number" :class="{ 'form-control': true,'is-invalid': error.phone_number }" id="phone_number" placeholder="1232123211" v-model="formData.data.phone_number" name="phone_number" >
                         <label for="phone_number">Nomor Telepon Orang Tua (Wali)</label>
                     </form>
                   </div>
@@ -169,7 +134,7 @@
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
                     <form class="form-floating">
-                        <input type="text" :class="{ 'form-control': true,'is-invalid': error.occupation }" id="occupation" placeholder="1232123211" v-model="formData.occupation" name="occupation" >
+                        <input type="text" :class="{ 'form-control': true,'is-invalid': error.occupation }" id="occupation" placeholder="1232123211" v-model="formData.data.occupation" name="occupation" >
                         <label for="occupation">Pekerjaan Orang Tua (Wali)</label>
                     </form>
                   </div>
@@ -183,7 +148,7 @@
                 <div class="input-group has-validation">
                   <div class="form-floating is-invalid">
                     <form class="form-floating">
-                        <input type="date" :class="{ 'form-control': true,'is-invalid': error.date_of_birth }"  id="date_of_birth" v-model="formData.date_of_birth" name="date_of_birth">
+                        <input type="date" :class="{ 'form-control': true,'is-invalid': error.date_of_birth }"  id="date_of_birth" v-model="formData.data.date_of_birth" name="date_of_birth">
                         <label for="date_of_birth">Tanggal Lahir Orang Tua (Wali)</label>
                     </form>
                   </div>
@@ -195,7 +160,7 @@
 
               <div class="col-md-6">
                 <div class="form-floating is-invalid">
-                  <textarea :class="{ 'form-control': true, 'is-invalid': error.place_of_birth }" placeholder="Tempat lahir....."  v-model="formData.place_of_birth" id="place_of_birth" style="height: 100px" name="place_of_birth"></textarea>
+                  <textarea :class="{ 'form-control': true, 'is-invalid': error.place_of_birth }" placeholder="Tempat lahir....."  v-model="formData.data.place_of_birth" id="place_of_birth" style="height: 100px" name="place_of_birth"></textarea>
                   <label for="place_of_birth">Tempat Lahir Orang Tua (Wali)</label>
                 </div>
                 <div v-if="error.place_of_birth" class="invalid-feedback">
@@ -205,7 +170,7 @@
 
               <div class="col-md-12">
                 <div class="form-floating is-invalid">
-                  <textarea :class="{ 'form-control': true, 'is-invalid': error.additional_notes }" placeholder="Tambahan keterangan lainnya....."  v-model="formData.additional_notes" id="additional_notes" style="height: 100px" name="additional_notes"></textarea>
+                  <textarea :class="{ 'form-control': true, 'is-invalid': error.additional_notes }" placeholder="Tambahan keterangan lainnya....."  v-model="formData.data.additional_notes" id="additional_notes" style="height: 100px" name="additional_notes"></textarea>
                   <label for="additional_notes">Tambahan keterangan lainnya</label>
                 </div>
                 <div v-if="error.additional_notes" class="invalid-feedback">
@@ -217,11 +182,11 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button class="btn btn-primary" style="float: right;" type="submit" :disabled="loadingSubmitOrangtua">
-                <span v-if="!loadingSubmitOrangtua"><i class="bi bi-arrow-repeat"></i> Submit Orangtua</span>
+              <button class="btn btn-info text-white" style="float: right;" type="submit" :disabled="loadingSubmitOrangtua">
+                <span v-if="!loadingSubmitOrangtua"><i class="bi bi-arrow-repeat"></i> Update Orangtua</span>
                 <span v-else>
                   <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                  <label> Submit Orangtua</label>
+                  <label> Update Orangtua</label>
                 </span>
               </button>
             </div>
@@ -238,8 +203,8 @@
     components: { },
     props: {
       dataListSiswa : Object,
-      dataListOrtu: Object,
       dataLoadedOrtu: Boolean,
+      dataFormUpdateOrtu: Object,
     },
     computed: {
       hasLoadedOrtu() {
@@ -248,31 +213,24 @@
       listOptionSiswa() { //pakai computed/watcher untuk serve data langsung
         return { ...this.dataListSiswa };
       },
-      listOptionOrtu() { 
-        return { ...this.dataListOrtu };
-      },
     },
     data() {
       return {
         baseUrl: process.env.BE_APP_BASE_URL,
         token: localStorage.getItem('tokenETP'),
-        formData: {
-          id: '', //id ortu
-          name:'',
-          id_siswa:'',
-          relationship:'',
-          date_of_birth:'',
-          place_of_birth:'',
-          address:'',
-          occupation:'',
-          phone_number:'',
-          email: '',
-          additional_notes: '',
-        },
+        formData: { ...this.dataFormUpdateOrtu },
         error : {},//error clientside
         loadingSubmitOrangtua : false, //progres btn
         errorMessages: [],//error serverside
-        isDropdownActive: true, 
+      }
+    },
+    watch: {
+      dataFormUpdateOrtu(newData) {
+        this.formData = { ...newData,
+          data: {
+            ...newData.data,
+          }
+        };
       }
     },
     methods: {
@@ -290,7 +248,7 @@
         this.loadingSubmitOrangtua = true //progres btn
         this.error = {};
         //validation
-        const requiredFields = ['id ','name','phone_number','relationship','id_siswa', 'address','date_of_birth'];
+        const requiredFields = ['name','phone_number','relationship','id_siswa', 'address','date_of_birth'];
         requiredFields.forEach(field => { 
           
           console.log(this.formData[field])

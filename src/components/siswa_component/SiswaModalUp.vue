@@ -237,7 +237,7 @@
                   <label> Submit Siswa</label>
                 </span>
               </button>
-            </div>
+            </div> 
         </form>
         </div>
       </div>
