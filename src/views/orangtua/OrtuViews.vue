@@ -19,8 +19,8 @@
                   </div>
                 </div> 
                 <div class="col-2">
-                  <button type="button" @click="fetchDataAdd()" class="btn btn-info btn-sm shadow AddGuru" data-bs-toggle="modal" data-bs-target="#modalOrtu"><i class="bi bi-plus-circle"></i> add orang tua</button>
-                  <GuruModalAdd @guruAdd="refreshData" :dataLoaded="dataLoaded"> </GuruModalAdd>
+                  <button type="button" @click="fetchDataAdd()" class="btn btn-info btn-sm shadow AddOrtu" data-bs-toggle="modal" data-bs-target="#modalOrtu"><i class="bi bi-plus-circle"></i> add orang tua</button>
+                  <OrtuModalAdd @ortuAdd="refreshData" :dataLoadedOrtu="dataLoaded" :dataListSiswa="fetchdataSiswa" > </OrtuModalAdd>
                 </div>
               </div>
               <!-- table -->
@@ -56,7 +56,6 @@
                         <th scope="col">Siswa - Hubungan</th>
                         <th scope="col">Alamat</th>
                         <th scope="col">No Telp</th>
-                        <th scope="col">Email</th>
                         <th scope="col">Pekerjaan</th>
                         <th scope="col">Action</th>
                       </tr>
@@ -71,11 +70,11 @@
                         </td>
                       </tr>
                       <tr v-else v-for="item in items" :key="item.id" style="vertical-align:middle;">
-                        <th scope="row" style="text-align: center;">{{ item.number }}</th>
+                        <td scope="row" style="text-align: center;">{{ item.number }}</td>
                         <td nowrap="" text="center">{{ item.name }}</td>
                         <td nowrap="" style="text-align: center;">
                             <span v-for="siswa in item.siswa" :key="siswa.id">
-                              {{ siswa.nama }} - {{ siswa.pivot.hubungan }} <span v-if="siswa !== item.siswa[item.siswa.length - 1]"><hr></span>
+                              {{ siswa.nama }} - <b>{{ siswa.pivot.hubungan }}</b> <span v-if="siswa !== item.siswa[item.siswa.length - 1]"><hr></span>
                             </span>
                         </td>
                         <td style="text-align: justify; width:20%;" @click="toggleExpandName(item.id)">
@@ -87,23 +86,18 @@
                           </span>
                         </td>
                         <td nowrap="" style="text-align: center;">{{ item.phone_number }}</td>
-                        <td nowrap="" style="text-align: center;">{{ item.email }}</td>
                         <td nowrap="" style="text-align: center;">{{ item.occupation }}</td>
                         <!-- <td nowrap="" style="text-align: center;">{{ item.gender }} <hr> {{ item.birth_date }}</td> -->
                        
                         <td nowrap="" width="40px;" style="text-align: center;">
-                            
-                            <router-link :to="'/detail-guru/' + item.id">
-                              <button class="btn btn-info btn-sm m-1 shadow" title="Detail">
-                                <i class="bi bi-eye text-white"></i>
-                              </button>
-                            </router-link>
-                            
+
+                            <button @click="infoDetail(item.email, item.date_of_birth, item.place_of_birth, item.additional_notes)"  class="btn btn-info btn-sm m-1 shadow"><i class="bi bi-eye text-white"></i></button>
+
                             <button @click="openUpdateGuru(item.id)" class="btn btn-primary btn-sm m-1 shadow" data-bs-toggle="modal" data-bs-target="#modalGuruUpdate" :disabled="OpenUpdateGuruBtn" title="Update">
                               <i class="bi bi-pencil"></i>
                             </button>
 
-                            <button @click="DeleteGuru(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteGuruBtn" title="Delete">
+                            <button @click="DeleteOrtu(item.id)" class="btn btn-outline-danger btn-sm m-1 shadow" :disabled="DeleteOrtuBtn" title="Delete">
                               <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -113,8 +107,9 @@
                       </tr>
                     </tbody>
                   </table>
+                  <!-- Detail Component -->
                 </div>
-                <GuruModalUp @guruUpdate="refreshData" :fileTemp="fileTemp" :dataLoadedGuru="FetchUpdateData" :dataFormUpdateGuru="FormDataUpdate"> </GuruModalUp>
+                <GuruModalUp @guruUpdate="refreshData" :dataLoadedGuru="FetchUpdateData" :dataFormUpdateGuru="FormDataUpdate"> </GuruModalUp>
                 <!-- table -->
                 <div class="row">
                   <div class="col-9">
@@ -159,10 +154,10 @@
   }
   /* ponsel */
   @media screen and (max-width: 767px) { 
-    .AddGuru {
+    .AddOrtu {
       font-size: 0; 
     }
-    .AddGuru i {
+    .AddOrtu i {
       font-size: 1rem; 
     }
     .searchBoxText i {
@@ -177,7 +172,7 @@
   }
   /* dekstop */
   @media screen and (min-width: 768px) {
-    .AddGuru{
+    .AddOrtu{
       float: right;
     }
     .searchBox{
@@ -188,13 +183,13 @@
 </style>
 
 <script>
-import GuruModalAdd from '@/components/guru_component/GuruModalAdd.vue';
+import OrtuModalAdd from '@/components/orangtua_component/OrangtuaModalAdd.vue';
 import GuruModalUp from '@/components/guru_component/GuruModalUp.vue';
 import axios from 'axios';
 
 export default {
   components:{
-    GuruModalAdd,
+    OrtuModalAdd,
     GuruModalUp,
   },
   data() {
@@ -218,14 +213,10 @@ export default {
       FetchUpdateData : false,
 
       FormDataUpdate : {}, //data for update
-      GetKelas : {}, //data for kelas list
-
       expandedName: [], //address expand
-      
-      FetchAddDataKelas : false,
-      DeleteGuruBtn : false,
+      DeleteOrtuBtn : false,
 
-      fileTemp: null,
+      fetchdataSiswa: {},
     }
   },
   mounted() {
@@ -335,49 +326,39 @@ export default {
     },
 
     async fetchDataAdd(){
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        this.dataLoaded = true
-    },
-
-    // ------------------update section---------------------
-    async openUpdateGuru(id){
-      this.OpenUpdateGuruBtn = true
-      this.FetchUpdateData = false
-      try {
-          const response = await axios.get(`${this.baseUrl}/api/get_guru/${id}`,{
+        try {
+          const response = await axios.get(`${this.baseUrl}/api/get_list_siswa`,{
               headers: {
                   'Authorization': `Bearer ${this.token}`,
               },
           });
 
-          const pathCloud = response.data.data.path_photo_cloud
-          const pathOri = response.data.data.photo_name_ori
-
-          try {
-              const path = { realpath: pathCloud } //path cloud photo
-              const responseTempFile = await axios.post(`${this.baseUrl}/api/temp_file`, path, {
-                  headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': `Bearer ${this.token}`,
-                  },
-              });
-              this.fileTemp = responseTempFile.data.data;
-          } catch (error) {
-              console.log(error)
-              this.fileTemp = `${this.baseUrl}/storage${pathOri}` //get local file jika fail
-          }
-
-          this.FormDataUpdate = response.data //send data to child component
-          this.FetchUpdateData = true
+          this.fetchdataSiswa = response.data.data//send data to child component
+          this.dataLoaded = true
           
-      } catch (error) {
-        this.Toasttt("Server Error", "error", "")
-      } finally { 
-        this.OpenUpdateGuruBtn = false
-      }
+        } catch (error) {
+          console.log(error)
+        } 
     },
-  
-    DeleteGuru(id){
+
+    infoDetail(email, date, place, addit) {
+        this.$swal({
+          title: "<strong>Detail information</strong>",
+          icon: "info",
+          html: `<br>
+          <div style="text-align:left;">
+                <p class="card-text"><b>Email : </b> ${email}</p>
+                <p class="card-text"><b>Birth Date : </b> ${date}</p>
+                <p class="card-text"><b>Birth Place : </b> ${place}</p>
+                <p class="card-text"><b>Additional Note : </b> ${addit}</p>
+          </div>       
+                 `,
+          showCloseButton: true,
+          focusConfirm: false,
+        });
+    },
+
+    DeleteOrtu(id){
       this.$swal({
         title: "Are you sure?",
         text: "You won't be able to revert this!",
@@ -389,14 +370,14 @@ export default {
         confirmButtonText: "Yes, delete it!",
         preConfirm: async () => {
           try {
-              this.DeleteGuruBtn = true
-              const response = await axios.delete(`${this.baseUrl}/api/del_guru/${id}`,  {
+              this.DeleteOrtuBtn = true
+              const response = await axios.delete(`${this.baseUrl}/api/del_orangtua/${id}`,  {
                 headers: {
                   'Authorization': `Bearer ${this.token}`,
                 },
               });
               
-              this.DeleteGuruBtn = false
+              this.DeleteOrtuBtn = false
               return response
 
             } catch (error) {
